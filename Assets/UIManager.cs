@@ -5,6 +5,7 @@ using System.IO.Ports;
 
 public class UIManager : MonoBehaviour
 {
+
     [Header("UIs")]
     [SerializeField] GameObject title;
     [SerializeField] GameObject gameEnd;
@@ -59,7 +60,7 @@ public class UIManager : MonoBehaviour
 
         if (isGameSucced)
         {
-            StartCoroutine(CheckingTakeOutShape());
+           StartCoroutine(CheckingTakeOutShape());
         }
     }
 
@@ -143,7 +144,7 @@ public class UIManager : MonoBehaviour
 
         int Bytes = CheckingSensors();
 
-        if (Bytes != 0) 
+        if (Bytes > 0) 
         {
             serialPort.Read(buffer, 0, Bytes);
 
