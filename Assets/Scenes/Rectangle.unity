@@ -745,7 +745,7 @@ GameObject:
   - component: {fileID: 1277899325}
   - component: {fileID: 1277899324}
   m_Layer: 5
-  m_Name: RightPoint
+  m_Name: TouchPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -910,13 +910,14 @@ MonoBehaviour:
   rightBottomCorner: {fileID: 958177861}
   cycloidPoint: {fileID: 500109788}
   pivotPoint: {fileID: 2036709192}
-  rightPoint: {fileID: 1277899324}
+  touchPoint: {fileID: 1277899324}
   StartPoint: {x: 0, y: 0, z: 0}
   curRotation: 0
-  rotationAngle: 0
+  rotationAnglePerSecond: 0
+  rotationDirection: 1
   cycloidPos: -1
   pivotPos: -1
-  rightPos: -1
+  touchPos: -1
 --- !u!1 &2036709190
 GameObject:
   m_ObjectHideFlags: 0
