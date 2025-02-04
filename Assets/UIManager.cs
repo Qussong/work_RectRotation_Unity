@@ -20,7 +20,9 @@ public class UIManager : MonoBehaviour
     byte[] buffer = new byte[1024];
 
     [Header("Game Succed")]
+    [Tooltip("test")]
     [SerializeField] bool isGameSucced = false;
+
     [SerializeField] bool TestBool = false;
 
 
