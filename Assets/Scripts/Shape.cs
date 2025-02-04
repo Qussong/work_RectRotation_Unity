@@ -12,50 +12,29 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Shape : MonoBehaviour
 {
-    public enum ShapeType
-    {
-        None,
-        Sphere,
-        Rect,
-        Hexagon
-    }
-
-    public ShapeType Type;
-
     Vector2 StartPos = Vector2.zero;
     [SerializeField] float EndPos;
     
-    Vector2 ChildStartPos = Vector2.zero;
-
-    float ANGLE = -10.0f;
-    Vector2 Pivot = Vector2.zero;
-
     [Header("Rect Information")]
-    Transform CycleTransform;
-    Transform PivotTransform;
-    Transform RightTransform;
+    [SerializeField] Vector3[] CornerPosition = new Vector3[4];
+    [SerializeField] GameObject[] Corners;
     [SerializeField] float LENGTH;
     [SerializeField] float Speed;
+    [SerializeField] bool AutoMove = false;
 
     [SerializeField] RectTransform OutLineRenderUI;
     [SerializeField] RectTransform InLineRenderUI;
 
     LineRenderer outlineRenderer;
     LineRenderer InlineRenderer;
-
-    Vector2 PrevPosition;
-    Vector2 NewPosition;
     void Start()
     {
         StartPos = transform.localPosition;
-        Debug.Log(StartPos);
 
-        ChildStartPos = transform.GetChild(0).position;
-        Debug.Log(ChildStartPos);
-
-        CycleTransform = transform.GetChild(0);
-        PivotTransform = transform.GetChild(1);
-        RightTransform = transform.GetChild(2);
+        CornerPosition[0] = Corners[0].transform.localPosition;
+        CornerPosition[1] = Corners[1].transform.localPosition;
+        CornerPosition[2] = Corners[2].transform.localPosition;
+        CornerPosition[3] = Corners[3].transform.localPosition;
 
         if (OutLineRenderUI != null && InLineRenderUI)
         {
@@ -76,27 +55,15 @@ public class Shape : MonoBehaviour
 
     void Update()
     {
-        if (Type == ShapeType.None)
-            return;
-
-        switch (Type)
+        if (AutoMove) 
         {
-            case ShapeType.Sphere:
-                RotateAndMoveSphere();
-                break;
-            case ShapeType.Rect:
-                RotateAndMoveRect();
-                break;
-            case ShapeType.Hexagon:
-                RotateAndMoveHexagon();
-                break;
-        }
-        Debug.Log(transform.position.x + " , " + EndPos);
+            RotateAndMoveRect(-10);
 
-        if (transform.localPosition.x >= EndPos) 
-        {
-            transform.localPosition = StartPos;
-            transform.rotation = Quaternion.identity;
+            if (transform.localPosition.x >= EndPos)
+            {
+                transform.localPosition = StartPos;
+                transform.rotation = Quaternion.identity;
+            }
         }
     }
 
@@ -114,28 +81,76 @@ public class Shape : MonoBehaviour
         InlineRenderer.SetPosition(InlineRenderer.positionCount - 1, worldInlinePos);
     }
 
-    void RotateAndMoveRect() 
+    void RotateAndMoveRect(float ANGLE) 
     {
-        if (RightTransform.position.y <= PivotTransform.position.y)
-        {
-            RightTransform.position = new Vector3(transform.position.x + LENGTH, transform.position.y + LENGTH, -1);
-            PivotTransform.position = new Vector3(transform.position.x + LENGTH, transform.position.y - LENGTH, -1);
-        }
+        ChangeTransform(ANGLE);
+
         // Pivot.y 중심 회전
-        transform.RotateAround(PivotTransform.position, Vector3.forward, ANGLE * Time.deltaTime * Speed);
+        transform.RotateAround(CornerPosition[4], Vector3.back, ANGLE * Time.deltaTime * Speed);
+  
+
         if (OutLineRenderUI != null && InLineRenderUI != null)
         {
             DrawLineRenderer();
         }
     }
 
-    void RotateAndMoveSphere()
+    void RotateAndMoveSphere(float ANGLE)
     {
         DrawLineRenderer();
     }
 
-    void RotateAndMoveHexagon()
+    void RotateAndMoveHexagon(float ANGLE)
     {
         DrawLineRenderer();
+    }
+
+    public void UpdateRotateAndLocation(float ANGLE) 
+    {
+        if (UIManager.Instance.shapeType == UIManager.ShapeType.None)
+            return;
+
+        switch (UIManager.Instance.shapeType)
+        {
+            case UIManager.ShapeType.Sphere:
+                RotateAndMoveSphere(ANGLE);
+                break;
+            case UIManager.ShapeType.Rect:
+                RotateAndMoveRect(ANGLE);
+                break;
+            case UIManager.ShapeType.Hexagon:
+                RotateAndMoveHexagon(ANGLE);
+                break;
+        }
+    }
+
+    void ChangeTransform(float Angle) 
+    {
+        if (Angle > 0)
+        {
+            if (CornerPosition[3].x > CornerPosition[3].x) 
+            {
+                CornerPosition[2] = Corners[2].transform.position;
+            }
+
+            if (CornerPosition[3].y >= CornerPosition[2].y) 
+            {
+                CornerPosition[3] = Corners[2].transform.position;
+                CornerPosition[2] = Corners[1].transform.position;
+            }
+        }
+        else 
+        {
+            if (CornerPosition[3].x < CornerPosition[2].x)
+            {
+                CornerPosition[2] = Corners[0].transform.position;
+            }
+
+            if (CornerPosition[3].y <= CornerPosition[2].y)
+            {
+                CornerPosition[3] = Corners[0].transform.position;
+                CornerPosition[0] = Corners[1].transform.position;
+            }
+        }
     }
 }
