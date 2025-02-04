@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1039928925615708436}
   - component: {fileID: 3039365678523251429}
   - component: {fileID: 4647367616875464667}
-  - component: {fileID: 40937241825437326}
   m_Layer: 5
   m_Name: HexagonShape
   m_TagString: Shape
@@ -29,7 +28,7 @@ RectTransform:
   m_GameObject: {fileID: 228251090293489993}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.1, y: 0.1, z: 0.1}
+  m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 7122684367344415470}
@@ -94,49 +93,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 930eb53407ee9b3428f6029a6dd6311f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Type: 2
   EndPos: 0
+  CornerPosition:
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  - {x: 0, y: 0, z: 0}
+  Corners: []
   LENGTH: 50
   Speed: 3
   AutoMove: 0
   OutLineRenderUI: {fileID: 9005021284381045953}
   InLineRenderUI: {fileID: 6675178088172565338}
---- !u!58 &40937241825437326
-CircleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 228251090293489993}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
 --- !u!1 &331756722654769409
 GameObject:
   m_ObjectHideFlags: 0

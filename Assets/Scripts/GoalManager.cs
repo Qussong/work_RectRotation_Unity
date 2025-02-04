@@ -4,11 +4,26 @@ using UnityEngine;
 
 public class GoalManager : MonoBehaviour
 {
-    private void OnCollisionEnter2D(Collision2D collision)
+    [SerializeField] bool InEnterToGoal = false;
+
+    public Shape Shape;
+
+    private void OnEnable()
     {
-        if (collision.gameObject.CompareTag("Shape")) 
+        InEnterToGoal = true;
+    }
+    private void Update()
+    {
+        if (InEnterToGoal) 
         {
-            UIManager.Instance.LoadGameEndUI();
+            float ShapeXPosition = Shape.gameObject.transform.position.x; 
+            float GoalXPosition = transform.position.x;
+
+            if (ShapeXPosition > GoalXPosition) 
+            {
+                InEnterToGoal = false;
+                UIManager.Instance.LoadGameEndUI();
+            }
         }
     }
 }

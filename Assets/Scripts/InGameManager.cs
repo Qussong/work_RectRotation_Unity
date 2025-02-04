@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -8,21 +9,18 @@ using static UnityEngine.Rendering.ProbeTouchupVolume;
 
 public class InGameManager : MonoBehaviour
 {
-    [SerializeField] Shape shape;
-    [SerializeField] GameObject Goal;
+    [SerializeField] Image goalimage;
     [SerializeField] Sprite[] goalSprites;
+    [SerializeField] GoalManager goalManager;
     [SerializeField] GameObject[] shapes;
     [SerializeField] float Timer;
     [SerializeField] Transform StartPosition;
-
-    Image goalimage;
-    TimerManager timermanager;
+    [SerializeField] TimerManager timermanager;
     GameObject InstantiateGameObject;
 
     private void Start()
     {
-        goalimage = Goal.GetComponent<Image>();
-        timermanager = GetComponentInChildren<TimerManager>();
+
     }
 
     private void Update()
@@ -55,7 +53,9 @@ public class InGameManager : MonoBehaviour
                 InstantiateGameObject = Instantiate(shapes[2], StartPosition);
                 break;
         }
-        
+
+        UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
+        goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();
         timermanager.StartTimer();
     }
 }

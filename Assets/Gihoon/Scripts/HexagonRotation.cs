@@ -44,7 +44,7 @@ public class HexagonRotation : MonoBehaviour
         if (null == ownerImage
             || null == leftBottomCorner
             || null == rightBottomCorner
-            || null == rightPoint)
+            || null == rightMiddleCorner)
         {
             throw new System.Exception("객체가 설정되지 않았습니다.");
         }
@@ -60,7 +60,7 @@ public class HexagonRotation : MonoBehaviour
             newX = startPosition.x + length;
             newY = startPosition.y;
             newZ = startPosition.z;
-            rightPoint.rectTransform.localPosition = new Vector3(newX, newY, newZ);
+            rightMiddleCorner.rectTransform.localPosition = new Vector3(newX, newY, newZ);
             // cycle
             newX = startPosition.x - length / 2;
             newY = startPosition.y - Mathf.Sqrt(3) * length / 2;
@@ -90,7 +90,7 @@ public class HexagonRotation : MonoBehaviour
         }*/
 
         curPosition = ownerImage.rectTransform.localPosition;
-        p 
+        
         curRotation = ownerImage.rectTransform.eulerAngles.z;
         Debug.Log("B Cur : " + curRotation + ", Prev : " + prevRotation + ", Total : " + totalRotation);
         totalRotation += (prevRotation - curRotation);

@@ -20,9 +20,9 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject title;
     [SerializeField] GameObject gameEnd;
     [SerializeField] GameObject inGame;
-    [SerializeField] Shape shape;
     [SerializeField] GameObject pleaseTakeOutShapeUI;
     [SerializeField] InGameManager gameManager;
+    public Shape shape;
 
     [Header("Serial Ports")]
     [SerializeField] SerialPort serialPort;
@@ -34,6 +34,12 @@ public class UIManager : MonoBehaviour
     [Header("Game Succed")]
     public bool isGameSucced = false;
     public ShapeType shapeType;
+
+    [Header("Test")]
+    public bool TestStartButton = false;
+
+    Coroutine LoadTitleUICoroutine;
+    Coroutine TakeOutShapeCoroutine;
 
 
     private void Start()
@@ -68,10 +74,12 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
+        if (TestStartButton && !isGameSucced)
+            TestFunction();
 
         if (serialPort != null)
         {
-            if (serialPort.IsOpen && isGameSucced == false)
+            if (serialPort.IsOpen && !isGameSucced)
             {
                 ReciveSignal();
             }
@@ -79,7 +87,7 @@ public class UIManager : MonoBehaviour
 
         if (isGameSucced)
         {
-           StartCoroutine(CheckingTakeOutShape());
+            TakeOutShapeCoroutine = StartCoroutine(CheckingTakeOutShape());
         }
     }
 
@@ -98,12 +106,27 @@ public class UIManager : MonoBehaviour
         title.SetActive(false);
         inGame.SetActive(false);
         isGameSucced = true;
+        gameEnd.SetActive(true);
+        TestStartButton = false;
 
-        if (shapeType == ShapeType.Sphere)
+        LoadTitleUICoroutine = StartCoroutine(WaitForSecondsToLoadTitleUI());
+
+/*        if (shapeType == ShapeType.Sphere)
         {
             gameEnd.SetActive(true);
         }
+        else 
+        {
+            LoadTitleUI();
+        }*/
 
+    }
+
+    IEnumerator WaitForSecondsToLoadTitleUI() 
+    {
+        yield return new WaitForSecondsRealtime(10.0f);
+        LoadTitleUI();
+        StopCoroutine(LoadTitleUICoroutine);
     }
 
     void LoadInGameUI() 
@@ -135,15 +158,15 @@ public class UIManager : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(2.0f);
 
-        if (CheckingSensors() == 0)
+        if (CheckingSensors() > 0)
         {
             LoadPleaseTakeOutShapeUI();
         }
         else
         {
             LoadTitleUI();
-            UnloadPleaseTakeOutShapeUI();        
-            StopAllCoroutines();
+            UnloadPleaseTakeOutShapeUI();
+            StopCoroutine(TakeOutShapeCoroutine);
         }
     }
 
@@ -221,6 +244,25 @@ public class UIManager : MonoBehaviour
                     shape.UpdateRotateAndLocation(10);
                 }
             }
+        }
+    }
+
+    void TestFunction() 
+    {
+        currentSensingIndex = 1;
+
+        if (shapeType == ShapeType.None)
+        {
+            SettingShape();
+        }
+
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            shape.UpdateRotateAndLocation(50f);
+        }
+        else if (Input.GetKeyDown(KeyCode.A)) 
+        {
+            shape.UpdateRotateAndLocation(-50f);
         }
     }
 

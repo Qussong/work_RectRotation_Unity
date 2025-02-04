@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -30,11 +31,6 @@ public class Shape : MonoBehaviour
     void Start()
     {
         StartPos = transform.localPosition;
-
-        CornerPosition[0] = Corners[0].transform.localPosition;
-        CornerPosition[1] = Corners[1].transform.localPosition;
-        CornerPosition[2] = Corners[2].transform.localPosition;
-        CornerPosition[3] = Corners[3].transform.localPosition;
 
         if (OutLineRenderUI != null && InLineRenderUI)
         {
@@ -86,8 +82,12 @@ public class Shape : MonoBehaviour
         ChangeTransform(ANGLE);
 
         // Pivot.y 중심 회전
-        transform.RotateAround(CornerPosition[4], Vector3.back, ANGLE * Time.deltaTime * Speed);
-  
+        //transform.RotateAround(CornerPosition[3], Vector3.back, ANGLE * Time.deltaTime * Speed);
+
+        Vector2 CurrentLoction = transform.localPosition;
+        CurrentLoction.x += ANGLE;
+
+        transform.localPosition = CurrentLoction;
 
         if (OutLineRenderUI != null && InLineRenderUI != null)
         {
@@ -97,6 +97,8 @@ public class Shape : MonoBehaviour
 
     void RotateAndMoveSphere(float ANGLE)
     {
+        transform.Translate(new Vector3(ANGLE, 0, 0));
+        transform.Rotate(0, 0, ANGLE);
         DrawLineRenderer();
     }
 
@@ -128,29 +130,10 @@ public class Shape : MonoBehaviour
     {
         if (Angle > 0)
         {
-            if (CornerPosition[3].x > CornerPosition[3].x) 
-            {
-                CornerPosition[2] = Corners[2].transform.position;
-            }
-
-            if (CornerPosition[3].y >= CornerPosition[2].y) 
-            {
-                CornerPosition[3] = Corners[2].transform.position;
-                CornerPosition[2] = Corners[1].transform.position;
-            }
         }
-        else 
+        else
         {
-            if (CornerPosition[3].x < CornerPosition[2].x)
-            {
-                CornerPosition[2] = Corners[0].transform.position;
-            }
-
-            if (CornerPosition[3].y <= CornerPosition[2].y)
-            {
-                CornerPosition[3] = Corners[0].transform.position;
-                CornerPosition[0] = Corners[1].transform.position;
-            }
         }
+
     }
 }
