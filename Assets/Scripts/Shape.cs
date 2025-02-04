@@ -10,7 +10,7 @@ using static UnityEngine.GraphicsBuffer;
 /// 
 /// </summary>
 
-public class NewBehaviourScript : MonoBehaviour
+public class Shape : MonoBehaviour
 {
     public enum ShapeType
     {
@@ -20,7 +20,7 @@ public class NewBehaviourScript : MonoBehaviour
         Hexagon
     }
 
-    bool[] booArray = new bool[60]; // default false
+    public ShapeType Type = ShapeType.None;
     Vector2 StartPos = Vector2.zero;
     Vector2 ChildStartPos = Vector2.zero;
 
@@ -35,8 +35,6 @@ public class NewBehaviourScript : MonoBehaviour
 
     [SerializeField] RectTransform OutLineRenderUI;
     [SerializeField] RectTransform InLineRenderUI;
-    [SerializeField] ShapeType Type = ShapeType.None;
-    [SerializeField] bool SetShapeType;
 
     LineRenderer outlineRenderer;
     LineRenderer InlineRenderer;
@@ -72,11 +70,6 @@ public class NewBehaviourScript : MonoBehaviour
 
     void Update()
     {
-        if (!SetShapeType) 
-        {
-            CheckShapeType();
-        }
-
         if (Type == ShapeType.None)
             return;
 
@@ -92,36 +85,6 @@ public class NewBehaviourScript : MonoBehaviour
                 RotateAndMoveHexagon();
                 break;
         }
-    }
-
-    void CheckShapeType()
-    {
-        int SensingCount = 0;
-
-        for (int i = 0; i < 60; ++i)
-        {
-            if (booArray[i] == true)
-            {
-                SensingCount++;
-            }
-        }
-
-        if (SensingCount < 4)
-        {
-            Type = ShapeType.Sphere;
-        }
-        else if (SensingCount < 6)
-        {
-            Type = ShapeType.Rect;
-        }
-        else if(SensingCount < 9)
-        {
-            Type = ShapeType.Hexagon;
-        }
-
-        if (SensingCount <= 0)
-            Type = ShapeType.None;
-            return;
     }
 
     void DrawLineRenderer() 
@@ -152,11 +115,11 @@ public class NewBehaviourScript : MonoBehaviour
 
     void RotateAndMoveSphere()
     {
-
+        DrawLineRenderer();
     }
 
     void RotateAndMoveHexagon()
     {
-
+        DrawLineRenderer();
     }
 }
