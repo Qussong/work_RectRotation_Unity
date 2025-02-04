@@ -67,9 +67,12 @@ public class UIManager : MonoBehaviour
     void LoadTitleUI()
     {
         isGameSucced = false;
+        shape.Type = Shape.ShapeType.None;
         title.SetActive(true);
         gameEnd.SetActive(false);
         inGame.SetActive(false);
+
+
     }
 
     void LoadGameEndUI() 
@@ -148,16 +151,20 @@ public class UIManager : MonoBehaviour
         {
             serialPort.Read(buffer, 0, Bytes);
 
-            for (int i = 0; i < Bytes; ++i) 
+            int bitIndex = 0;
+
+            for (int i = 0; i < Bytes; ++i)
             {
-                if (buffer[i] == 0 || buffer[i] != 1)
+                for (int j = 0; j < 8; ++j)
                 {
-                    sensors[i] = false;
-                }
-                else if(buffer[i] == 1) 
-                {
-                    sensors[i] = true;
-                    currentSensingIndex = i;
+                    bool bit = (buffer[i] & (1 << j)) != 0;
+
+                    if (bitIndex < sensors.Length)
+                    {
+                        sensors[bitIndex] = bit;
+                    }
+
+                    bitIndex++; // 전체 비트 인덱스 증가
                 }
             }
 

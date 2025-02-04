@@ -20,18 +20,22 @@ public class Shape : MonoBehaviour
         Hexagon
     }
 
-    public ShapeType Type = ShapeType.None;
+    public ShapeType Type;
+
     Vector2 StartPos = Vector2.zero;
+    [SerializeField] float EndPos;
+    
     Vector2 ChildStartPos = Vector2.zero;
 
     float ANGLE = -10.0f;
-    float LENGTH = 50.0f;
     Vector2 Pivot = Vector2.zero;
 
     [Header("Rect Information")]
     Transform CycleTransform;
     Transform PivotTransform;
     Transform RightTransform;
+    [SerializeField] float LENGTH;
+    [SerializeField] float Speed;
 
     [SerializeField] RectTransform OutLineRenderUI;
     [SerializeField] RectTransform InLineRenderUI;
@@ -41,12 +45,9 @@ public class Shape : MonoBehaviour
 
     Vector2 PrevPosition;
     Vector2 NewPosition;
-
-    int Speed = 3;
-
     void Start()
     {
-        StartPos = transform.position;
+        StartPos = transform.localPosition;
         Debug.Log(StartPos);
 
         ChildStartPos = transform.GetChild(0).position;
@@ -56,16 +57,21 @@ public class Shape : MonoBehaviour
         PivotTransform = transform.GetChild(1);
         RightTransform = transform.GetChild(2);
 
-        outlineRenderer = OutLineRenderUI.GetComponent<LineRenderer>();
-        InlineRenderer = InLineRenderUI.GetComponent<LineRenderer>();
+        if (OutLineRenderUI != null && InLineRenderUI)
+        {
 
-        outlineRenderer.positionCount = 0;
-        outlineRenderer.startWidth = 0.05f;
-        outlineRenderer.endWidth = 0.05f;
+            outlineRenderer = OutLineRenderUI.GetComponent<LineRenderer>();
+            InlineRenderer = InLineRenderUI.GetComponent<LineRenderer>();
 
-        InlineRenderer.positionCount = 0;
-        InlineRenderer.startWidth = 0.05f;
-        InlineRenderer.endWidth = 0.05f;
+            outlineRenderer.positionCount = 0;
+            outlineRenderer.startWidth = 0.05f;
+            outlineRenderer.endWidth = 0.05f;
+
+            InlineRenderer.positionCount = 0;
+            InlineRenderer.startWidth = 0.05f;
+            InlineRenderer.endWidth = 0.05f;
+        }
+        
     }
 
     void Update()
@@ -84,6 +90,13 @@ public class Shape : MonoBehaviour
             case ShapeType.Hexagon:
                 RotateAndMoveHexagon();
                 break;
+        }
+        Debug.Log(transform.position.x + " , " + EndPos);
+
+        if (transform.localPosition.x >= EndPos) 
+        {
+            transform.localPosition = StartPos;
+            transform.rotation = Quaternion.identity;
         }
     }
 
@@ -110,7 +123,10 @@ public class Shape : MonoBehaviour
         }
         // Pivot.y 중심 회전
         transform.RotateAround(PivotTransform.position, Vector3.forward, ANGLE * Time.deltaTime * Speed);
-        DrawLineRenderer();
+        if (OutLineRenderUI != null && InLineRenderUI != null)
+        {
+            DrawLineRenderer();
+        }
     }
 
     void RotateAndMoveSphere()
