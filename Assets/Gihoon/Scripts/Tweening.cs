@@ -15,6 +15,7 @@ public class Tween : MonoBehaviour
         transform.DOLocalMove(new Vector3(0, 100, 0), 2f)
             .SetLoops(-1, LoopType.Yoyo)    // Infinite Loop Move
             .SetEase(Ease.InOutSine);       // Soft Move
+
     }
 
     void Update()
