@@ -4,5 +4,5 @@ using UnityEngine;
 
 public interface MoveAndRotateInterface
 {
-    void MoveAndRotate();
+    void MoveAndRotate(float Angle);
 }

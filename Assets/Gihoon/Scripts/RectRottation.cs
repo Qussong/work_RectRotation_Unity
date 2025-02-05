@@ -66,7 +66,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     void Update()
     {
-
+       
     }
 
     float InterpolationAngle(float angle)
@@ -93,7 +93,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         return nextValue;
     }
 
-    void MoveAndRotateInterface.MoveAndRotate()
+    public void MoveAndRotate(float Angle)
     {
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
@@ -123,9 +123,9 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y < pivotPoint.transform.position.y)
             {
-                //rectImage.rectTransform.localRotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
                 //rectImage.rectTransform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
-                //Time.timeScale = 0;
+                curRotation = rectImage.rectTransform.rotation.eulerAngles.z;
+                transform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
 
                 pivotPos = ModuloOperatorRight(pivotPos);
                 touchPos = ModuloOperatorRight(touchPos);

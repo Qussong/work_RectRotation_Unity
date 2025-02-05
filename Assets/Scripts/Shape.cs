@@ -32,7 +32,7 @@ public class Shape : MonoBehaviour
     [SerializeField] RectTransform OutLineRenderUI;
     [SerializeField] RectTransform InLineRenderUI;
 
-    [SerializeField] GameObject ShapeGameObject;
+    [SerializeField] MoveAndRotateInterface moveAndRotateInterface;
 
     LineRenderer outlineRenderer;
     LineRenderer InlineRenderer;
@@ -54,15 +54,22 @@ public class Shape : MonoBehaviour
             InlineRenderer.startWidth = 0.05f;
             InlineRenderer.endWidth = 0.05f;
         }
-        
     }
 
     void Update()
     {
         if (AutoMove) 
         {
-            RotateAndMoveRect(-10);
 
+           if (moveAndRotateInterface == null)
+           {
+               moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
+           }
+
+           moveAndRotateInterface.MoveAndRotate(10);
+
+           DrawLineRenderer();
+           
             if (transform.localPosition.x >= EndPos)
             {
                 transform.localPosition = StartPos;
@@ -85,41 +92,21 @@ public class Shape : MonoBehaviour
         InlineRenderer.SetPosition(InlineRenderer.positionCount - 1, worldInlinePos);
     }
 
-    void RotateAndMoveRect(float ANGLE) 
-    {
-
-        if (OutLineRenderUI != null && InLineRenderUI != null)
-        {
-            DrawLineRenderer();
-        }
-    }
-
-    void RotateAndMoveSphere(float ANGLE)
-    {
-        float angleRad = ANGLE * Mathf.Deg2Rad;
-        float radius = 0.5f;
-        float moveDistance = radius * angleRad;
-        transform.Translate(new Vector3(moveDistance, 0, 0));
-        transform.Rotate(0, 0, ANGLE);
-
-        DrawLineRenderer();
-    }
-
-    void RotateAndMoveHexagon(float ANGLE)
-    {
-        DrawLineRenderer();
-    }
-
     public void UpdateRotateAndLocation(float ANGLE) 
     {
         if (UIManager.Instance.shapeType == UIManager.ShapeType.None)
             return;
 
-        if (ShapeGameObject != null) 
+  
+        if (moveAndRotateInterface == null)
         {
-            MoveAndRotateInterface FC = ShapeGameObject.GetComponent<MoveAndRotateInterface>();
-            FC.MoveAndRotate();
+            moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
         }
+
+        moveAndRotateInterface.MoveAndRotate(10);
+
+        DrawLineRenderer();
+        
         
     }
 }
