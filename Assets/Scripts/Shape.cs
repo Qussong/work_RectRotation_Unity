@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
 using static UnityEngine.GridBrushBase;
+using static UnityEngine.Rendering.ProbeTouchupVolume;
 
 /// <summary>
 /// 
@@ -66,9 +67,7 @@ public class Shape : MonoBehaviour
                moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
            }
 
-           moveAndRotateInterface.MoveAndRotate(10);
-
-           DrawLineRenderer();
+           moveAndRotateInterface.MoveAndRotate(80);
            
             if (transform.localPosition.x >= EndPos)
             {
@@ -81,35 +80,16 @@ public class Shape : MonoBehaviour
         }
     }
 
-    void DrawLineRenderer() 
-    {
-        Vector3 worldOutlinePos = Camera.main.ScreenToWorldPoint(OutLineRenderUI.position);
-        Vector3 worldInlinePos = Camera.main.ScreenToWorldPoint(InLineRenderUI.position);
-        worldOutlinePos.z = 0;
-        worldInlinePos.z = 0;
-
-        outlineRenderer.positionCount++;
-        outlineRenderer.SetPosition(outlineRenderer.positionCount - 1, worldOutlinePos);
-
-        InlineRenderer.positionCount++;
-        InlineRenderer.SetPosition(InlineRenderer.positionCount - 1, worldInlinePos);
-    }
-
     public void UpdateRotateAndLocation(float ANGLE) 
     {
         if (UIManager.Instance.shapeType == UIManager.ShapeType.None)
             return;
 
-  
         if (moveAndRotateInterface == null)
         {
             moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
         }
 
-        moveAndRotateInterface.MoveAndRotate(10);
-
-        DrawLineRenderer();
-        
-        
+        moveAndRotateInterface.MoveAndRotate(ANGLE);
     }
 }

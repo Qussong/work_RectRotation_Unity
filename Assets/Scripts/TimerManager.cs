@@ -8,20 +8,24 @@ public class TimerManager : MonoBehaviour
     [SerializeField] Image timerimage;
     public bool start = false;
 
+    private void OnEnable()
+    {
+        timerimage.fillAmount = 1;
+    }
 
     void Update()
     {
-        if (start) 
+        if (start && !UIManager.Instance.isGameEnd) 
         {
             timerimage.fillAmount -= Time.deltaTime * 0.05f;
 
             if (timerimage.fillAmount <= 0) 
             {
                 timerimage.fillAmount = 0;
-                UIManager.Instance.LoadGameEndUI();
+                UIManager.Instance.isGameEnd = true;
+                UIManager.Instance.IsTimeOut = true;
                 UIManager.Instance.TestStartButton = false;
                 start = false;
-                timerimage.fillAmount = 1;
             }
         }
     }

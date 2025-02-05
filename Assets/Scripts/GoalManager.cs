@@ -4,25 +4,28 @@ using UnityEngine;
 
 public class GoalManager : MonoBehaviour
 {
-    [SerializeField] bool InEnterToGoal = false;
+    [SerializeField] bool EnterToGoal = false;
 
     public Shape Shape;
 
     private void OnEnable()
     {
-        InEnterToGoal = true;
+        EnterToGoal = true;
     }
     private void Update()
     {
-        if (InEnterToGoal) 
+        if (EnterToGoal) 
         {
-            float ShapeXPosition = Shape.gameObject.transform.position.x; 
-            float GoalXPosition = transform.position.x;
-
-            if (ShapeXPosition > GoalXPosition) 
+            if (Shape != null)
             {
-                InEnterToGoal = false;
-                UIManager.Instance.LoadGameEndUI();
+                float ShapeXPosition = Shape.gameObject.transform.position.x;
+                float GoalXPosition = transform.position.x;
+
+                if (ShapeXPosition > GoalXPosition)
+                {
+                    EnterToGoal = false;
+                    UIManager.Instance.isGameEnd = true;
+                }
             }
         }
     }

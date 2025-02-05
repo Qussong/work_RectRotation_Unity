@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using System.IO.Ports;
 using static UIManager;
+using System.Configuration;
+using NUnit.Framework.Constraints;
+using System.Threading;
 
 public class UIManager : MonoBehaviour
 {
@@ -22,24 +25,32 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject inGame;
     [SerializeField] GameObject pleaseTakeOutShapeUI;
     [SerializeField] InGameManager gameManager;
+    [SerializeField] GameEndUI gameEndUI;
     public Shape shape;
 
     [Header("Serial Ports")]
     [SerializeField] SerialPort serialPort;
-    bool[] sensors = new bool[61];
-    int currentSensingIndex = 0;
-    int previousSensingIndex = 0;
+    [SerializeField] bool[] sensors = new bool[61];
+    int currentLastSensingIndex = 0;
+    int currentStartSensingIndex = 0;
+    int previousStartSensingIndex = 0;
+    int previousLastSensingIndex = 0;
     byte[] buffer = new byte[1024];
 
-    [Header("Game Succed")]
-    public bool isGameSucced = false;
+    [Header("Game Status")]
+    public bool isGameEnd = false;
+    public bool IsTimeOut = false;
     public ShapeType shapeType;
+
+    [Header("Shape Setting")]
+    [Tooltip("하단의 값을 변경하면 센서 배열의 해당 인덱스 값이 감지된 결과를 바탕으로 설정된 도형으로 인식합니다.")]
+    [SerializeField] int RectIndex = 1;
+    [SerializeField] int HexagonIndex = 2;
 
     [Header("Test")]
     public bool TestStartButton = false;
 
-    Coroutine LoadTitleUICoroutine;
-    Coroutine TakeOutShapeCoroutine;
+    bool IsPlayTakeOutShapeCoroutine = false;
 
 
     private void Start()
@@ -52,7 +63,7 @@ public class UIManager : MonoBehaviour
         {
             Destroy(Instance);
         }
-        
+
         LoadTitleUI();
 
         foreach (var Name in SerialPort.GetPortNames()) 
@@ -74,58 +85,111 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        if (TestStartButton && !isGameSucced)
+        if (TestStartButton && !isGameEnd)
+        {
             TestFunction();
+        }
 
         if (serialPort != null)
         {
-            if (serialPort.IsOpen && !isGameSucced)
+            if (serialPort.IsOpen && !isGameEnd)
             {
                 ReciveSignal();
             }
         }
 
-        if (isGameSucced)
+        if (isGameEnd)
         {
-            TakeOutShapeCoroutine = StartCoroutine(CheckingTakeOutShape());
+            if (!IsPlayTakeOutShapeCoroutine)
+            {
+                StartCoroutine(CheckingTakeOutShape());
+            }
         }
     }
 
     public void LoadTitleUI()
     {
-        isGameSucced = false;
+        isGameEnd = false;
         shapeType = ShapeType.None;
         title.SetActive(true);
         gameEnd.SetActive(false);
         inGame.SetActive(false);
+        StopAllCoroutines();
 
     }
 
     public void LoadGameEndUI() 
     {
         title.SetActive(false);
-        inGame.SetActive(false);
-        isGameSucced = true;
         gameEnd.SetActive(true);
-        TestStartButton = false;
 
-        LoadTitleUICoroutine = StartCoroutine(WaitForSecondsToLoadTitleUI());
+        if (IsTimeOut)
+        {
+            IsTimeOut = false;
+            gameEndUI.ShowUI(GameEndUI.UIType.MissionFail);
+            StartCoroutine(WaitForSecondsToLoadTitleUI());
+        }
+        else
+        {
+            if (shapeType == ShapeType.Sphere) 
+            {
+                gameEndUI.ShowUI(GameEndUI.UIType.SphereEnd);
+                inGame.SetActive(false);
+                StartCoroutine(CheckNextShapeInsert());
+            }
+            else
+            {
+                gameEndUI.ShowUI(GameEndUI.UIType.MissionSucceed);
+                StartCoroutine(WaitForSecondsToLoadTitleUI());
+            }
+        }
+
+        TestStartButton = false;
+    }
+
+    IEnumerator CheckNextShapeInsert() 
+    {
+        yield return new WaitForSecondsRealtime(5.0f);
+
+        float ResetTimer = 0;
+
+        while (CheckingSensors() > 0) 
+        {
+            ResetTimer += 1.0f;
+
+            yield return new WaitForSecondsRealtime(1.0f);
+
+            if (ResetTimer <= 10.0f) 
+            {
+                LoadTitleUI();
+                ResetTimer = 0.0f;
+                yield break;
+            }
+
+            if (CheckingSensors() < 0) 
+            {
+                LoadInGameUI();
+                yield break;
+            }
+        }
+
+        LoadInGameUI();
     }
 
     IEnumerator WaitForSecondsToLoadTitleUI() 
     {
         yield return new WaitForSecondsRealtime(10.0f);
         LoadTitleUI();
-        StopCoroutine(LoadTitleUICoroutine);
     }
 
     void LoadInGameUI() 
     {
-        isGameSucced = false;
+        SettingShape();
+        gameManager.GameStart();
+        isGameEnd = false;
         gameEnd.SetActive(false);
         title.SetActive(false);
         inGame.SetActive(true);
-        gameManager.GameStart();
     }
 
     void LoadPleaseTakeOutShapeUI() 
@@ -146,30 +210,31 @@ public class UIManager : MonoBehaviour
 
     IEnumerator CheckingTakeOutShape() 
     {
+        IsPlayTakeOutShapeCoroutine = true;
+
         yield return new WaitForSecondsRealtime(2.0f);
 
-        if (CheckingSensors() > 0)
+        while (CheckingSensors() > 0)
         {
             LoadPleaseTakeOutShapeUI();
+            yield return new WaitForSecondsRealtime(1.0f);
         }
-        else
-        {
-            LoadTitleUI();
-            UnloadPleaseTakeOutShapeUI();
-            StopCoroutine(TakeOutShapeCoroutine);
-        }
+
+        isGameEnd = false;
+        UnloadPleaseTakeOutShapeUI();
+        LoadGameEndUI();
+        IsPlayTakeOutShapeCoroutine = false;
     }
 
     public int CheckingSensors() 
     {
-
         if (serialPort == null)
-            return 0;
+            return -1;
 
         if (!serialPort.IsOpen)
         {
             Debug.Log("Serial Port Is Not Open");
-            return 0;
+            return -1;
         }
 
         return serialPort.ReadByte();
@@ -177,7 +242,8 @@ public class UIManager : MonoBehaviour
 
     void ReciveSignal() 
     {
-        previousSensingIndex = currentSensingIndex;
+        previousLastSensingIndex = currentLastSensingIndex;
+        previousStartSensingIndex = currentStartSensingIndex;
 
         int Bytes = CheckingSensors();
 
@@ -204,7 +270,13 @@ public class UIManager : MonoBehaviour
 
                         if (bit) 
                         {
-                            currentSensingIndex = bitIndex;
+
+                            if (currentStartSensingIndex > bitIndex) 
+                            {
+                                currentStartSensingIndex = bitIndex;
+                            }
+
+                            currentLastSensingIndex = bitIndex;
                         }
                     }
 
@@ -212,72 +284,64 @@ public class UIManager : MonoBehaviour
                 }
             }
 
-            if (previousSensingIndex == currentSensingIndex) 
+            if (previousLastSensingIndex == currentLastSensingIndex) 
             {
+                Debug.Log("Data Not Changed");
                 return;
             }
 
-            if (shapeType == ShapeType.None)
+            if (currentLastSensingIndex - currentStartSensingIndex > 8) 
             {
-                SettingShape();
+                Debug.Log("Insert at last two shape");
+                return;
+            }
+
+            int Result = currentLastSensingIndex - previousLastSensingIndex;
+
+            if (Result < 0)
+            {
+                shape.UpdateRotateAndLocation(-10);
             }
             else 
             {
-                int Result = currentSensingIndex - previousSensingIndex;
-
-                if (Result < 0)
-                {
-                    shape.UpdateRotateAndLocation(-10);
-                }
-                else 
-                {
-                    shape.UpdateRotateAndLocation(10);
-                }
+                shape.UpdateRotateAndLocation(10);
             }
         }
     }
 
     void TestFunction() 
     {
-        currentSensingIndex = 1;
+        currentLastSensingIndex = 1;
 
-        if (shapeType == ShapeType.None)
+        if (shapeType == ShapeType.None) 
         {
-            SettingShape();
+            LoadInGameUI();
         }
 
-        if (Input.GetKeyDown(KeyCode.D))
+        if (Input.GetKey(KeyCode.D))
         {
-            shape.UpdateRotateAndLocation(50f);
+            shape.UpdateRotateAndLocation(55f);
         }
-        else if (Input.GetKeyDown(KeyCode.A)) 
+        else if (Input.GetKey(KeyCode.A)) 
         {
-            shape.UpdateRotateAndLocation(-50f);
+            shape.UpdateRotateAndLocation(-55f);
         }
     }
 
     void SettingShape() 
     {
-        switch (currentSensingIndex)
+        if (shapeType == ShapeType.Sphere)
         {
-            case 1:
-                shapeType = ShapeType.Sphere;
-                break;
-            case 4:
+            if (currentLastSensingIndex == RectIndex)
                 shapeType = ShapeType.Rect;
-                break;
-            case 6:
+            else if(currentLastSensingIndex == HexagonIndex)
                 shapeType = ShapeType.Hexagon;
-                break;
-            default:
+            else
                 shapeType = ShapeType.None;
-                break;
         }
-
-        if (shapeType != ShapeType.None)
+        else if (shapeType == ShapeType.None) 
         {
-            LoadInGameUI();
+            shapeType = ShapeType.Sphere;
         }
-       
     }
 }

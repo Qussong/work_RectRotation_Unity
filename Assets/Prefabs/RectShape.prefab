@@ -75,7 +75,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -7152040564324152670, guid: 6df3609d24fc096498006379c13df942, type: 3}
+  m_Sprite: {fileID: -6420873467790157900, guid: 518ff7fd122f98c4f90d2582ea7fc44b, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -97,22 +97,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 930eb53407ee9b3428f6029a6dd6311f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectImage: {fileID: 0}
-  leftBottomCorner: {fileID: 0}
-  leftTopCorner: {fileID: 0}
-  rightTopCorner: {fileID: 0}
-  rightBottomCorner: {fileID: 0}
-  cycloidPoint: {fileID: 0}
-  pivotPoint: {fileID: 0}
-  touchPoint: {fileID: 0}
-  rotationAnglePerSecond: 0
-  rotationDirection: 1
-  StartPoint: {x: 0, y: 0, z: 0}
-  curRotation: 0
-  cycloidPos: -1
-  pivotPos: -1
-  touchPos: -1
-  AutoMove: 1
+  AutoMove: 0
   StartPos: {x: 0, y: 0, z: 0}
   EndPos: 0
   OutLineRenderUI: {fileID: 9005021284381045953}
@@ -124,7 +109,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 228251090293489993}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee607e2dc15b33a40aff81b1911f1486, type: 3}
   m_Name: 
@@ -137,7 +122,7 @@ MonoBehaviour:
   cycloidPoint: {fileID: 1389088900178763115}
   pivotPoint: {fileID: 980846985571475519}
   touchPoint: {fileID: 4890279558541664901}
-  rotationAnglePerSecond: 0
+  rotationAnglePerSecond: 100
   rotationDirection: 1
   StartPoint: {x: 0, y: 0, z: 0}
   curRotation: 0
@@ -460,7 +445,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 0.6657697, b: 0, a: 1}
+  m_Color: {r: 1, g: 0.6657697, b: 0, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -717,7 +702,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.6392157, g: 0.98823535, b: 0.058823533, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -796,6 +781,15 @@ LineRenderer:
         weightedMode: 0
         inWeight: 0.33333334
         outWeight: 0.33333334
+      - serializedVersion: 3
+        time: 0.6088916
+        value: 0.10320777
+        inSlope: 0
+        outSlope: 0
+        tangentMode: 0
+        weightedMode: 0
+        inWeight: 0
+        outWeight: 0
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
@@ -875,7 +869,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 150, y: 15}
+  m_AnchoredPosition: {x: 157, y: 163}
   m_SizeDelta: {x: 28, y: 28}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &2914130693589846486
