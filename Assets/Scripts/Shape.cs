@@ -72,8 +72,11 @@ public class Shape : MonoBehaviour
            
             if (transform.localPosition.x >= EndPos)
             {
+                // Origin Settings
                 transform.localPosition = StartPos;
                 transform.rotation = Quaternion.identity;
+                moveAndRotateInterface.InitPivotPoint();
+
             }
         }
     }

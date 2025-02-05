@@ -53,6 +53,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         corners[2] = rightTopCorner;    // Corner.RT
         corners[3] = rightBottomCorner; // Corner.RB
 
+        /*
         cycloidPos = (int)CornerName.LB;
         pivotPos = (int)CornerName.RB;
         touchPos = (int)CornerName.RT;
@@ -60,13 +61,15 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         cycloidPoint.rectTransform.localPosition = corners[cycloidPos].rectTransform.localPosition;
         pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
         touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
+        */
+        InitPivotPoint();
 
         rotationAnglePerSecond = 50;
     }
 
     void Update()
     {
-        MoveAndRotate();
+        MoveAndRotate(10);
 
     }
 
@@ -153,6 +156,17 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
         curRotation = rectImage.rectTransform.rotation.eulerAngles.z;
         prevRotationDirection = rotationDirection;
+    }
+
+    public void InitPivotPoint()
+    {
+        cycloidPos = (int)CornerName.LB;
+        pivotPos = (int)CornerName.RB;
+        touchPos = (int)CornerName.RT;
+
+        cycloidPoint.rectTransform.localPosition = corners[cycloidPos].rectTransform.localPosition;
+        pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
+        touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
     }
 
 }
