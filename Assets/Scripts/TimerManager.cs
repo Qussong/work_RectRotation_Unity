@@ -19,6 +19,7 @@ public class TimerManager : MonoBehaviour
             {
                 timerimage.fillAmount = 0;
                 UIManager.Instance.LoadGameEndUI();
+                UIManager.Instance.TestStartButton = false;
                 start = false;
                 timerimage.fillAmount = 1;
             }

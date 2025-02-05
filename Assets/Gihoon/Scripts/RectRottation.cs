@@ -4,7 +4,7 @@ using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RectRottation : MonoBehaviour
+public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 {
     public enum CornerName
     {
@@ -66,11 +66,40 @@ public class RectRottation : MonoBehaviour
 
     void Update()
     {
+
+    }
+
+    float InterpolationAngle(float angle)
+    {
+        float result = 0f;
+
+        if (angle <= 90) result = 90f;
+        else if (angle <= 180) result = 180f;
+        else if (angle <= 270) result = 270f;
+        else result = 360f;
+
+        return result;
+    }
+
+    int ModuloOperatorRight(int curValue)
+    {
+        int nextValue = (curValue - 1 + 4) % 4;
+        return nextValue;
+    }
+
+    int ModuloOperatorLeft(int curValue)
+    {
+        int nextValue = (curValue + 1) % 4;
+        return nextValue;
+    }
+
+    void MoveAndRotateInterface.MoveAndRotate()
+    {
         // When rotation direction change
-        if(prevRotationDirection != rotationDirection)
+        if (prevRotationDirection != rotationDirection)
         {
             // When new rotation direction is RIGHT
-            if(rotationDirection == true)
+            if (rotationDirection == true)
             {
                 // Touch Point Position = pivot - 1
                 touchPos = ModuloOperatorRight(pivotPos);
@@ -81,6 +110,7 @@ public class RectRottation : MonoBehaviour
                 // Touch Point Position = pivot + 1
                 touchPos = ModuloOperatorLeft(pivotPos);
             }
+
             touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
         }
 
@@ -122,30 +152,6 @@ public class RectRottation : MonoBehaviour
 
         curRotation = rectImage.rectTransform.rotation.eulerAngles.z;
         prevRotationDirection = rotationDirection;
-    }
-
-    float InterpolationAngle(float angle)
-    {
-        float result = 0f;
-
-        if (angle <= 90) result = 90f;
-        else if (angle <= 180) result = 180f;
-        else if (angle <= 270) result = 270f;
-        else result = 360f;
-
-        return result;
-    }
-
-    int ModuloOperatorRight(int curValue)
-    {
-        int nextValue = (curValue - 1 + 4) % 4;
-        return nextValue;
-    }
-
-    int ModuloOperatorLeft(int curValue)
-    {
-        int nextValue = (curValue + 1) % 4;
-        return nextValue;
     }
 
 }

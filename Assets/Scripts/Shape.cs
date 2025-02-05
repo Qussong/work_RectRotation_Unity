@@ -1,7 +1,10 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using static UnityEngine.GraphicsBuffer;
+using static UnityEngine.GridBrushBase;
 
 /// <summary>
 /// 
@@ -12,29 +15,30 @@ using static UnityEngine.GraphicsBuffer;
 
 public class Shape : MonoBehaviour
 {
-    Vector2 StartPos = Vector2.zero;
-    [SerializeField] float EndPos;
-    
-    [Header("Rect Information")]
-    [SerializeField] Vector3[] CornerPosition = new Vector3[4];
-    [SerializeField] GameObject[] Corners;
-    [SerializeField] float LENGTH;
-    [SerializeField] float Speed;
-    [SerializeField] bool AutoMove = false;
+    public enum CornerName
+    {
+        LB, // LeftBottom (0)
+        LT, // LeftTop (1)
+        RT, // RightTop (2)
+        RB  // RightBottom (3)
+    }
 
+    [Header("Title Rect Property")]
+    [SerializeField] bool AutoMove = false;
+    [SerializeField] Vector3 StartPos;
+    [SerializeField] float EndPos;
+
+    [Header("Line Render")]
     [SerializeField] RectTransform OutLineRenderUI;
     [SerializeField] RectTransform InLineRenderUI;
+
+    [SerializeField] GameObject ShapeGameObject;
 
     LineRenderer outlineRenderer;
     LineRenderer InlineRenderer;
     void Start()
     {
         StartPos = transform.localPosition;
-
-        CornerPosition[0] = Corners[0].transform.localPosition;
-        CornerPosition[1] = Corners[1].transform.localPosition;
-        CornerPosition[2] = Corners[2].transform.localPosition;
-        CornerPosition[3] = Corners[3].transform.localPosition;
 
         if (OutLineRenderUI != null && InLineRenderUI)
         {
@@ -83,11 +87,6 @@ public class Shape : MonoBehaviour
 
     void RotateAndMoveRect(float ANGLE) 
     {
-        ChangeTransform(ANGLE);
-
-        // Pivot.y 중심 회전
-        transform.RotateAround(CornerPosition[4], Vector3.back, ANGLE * Time.deltaTime * Speed);
-  
 
         if (OutLineRenderUI != null && InLineRenderUI != null)
         {
@@ -97,6 +96,12 @@ public class Shape : MonoBehaviour
 
     void RotateAndMoveSphere(float ANGLE)
     {
+        float angleRad = ANGLE * Mathf.Deg2Rad;
+        float radius = 0.5f;
+        float moveDistance = radius * angleRad;
+        transform.Translate(new Vector3(moveDistance, 0, 0));
+        transform.Rotate(0, 0, ANGLE);
+
         DrawLineRenderer();
     }
 
@@ -110,47 +115,11 @@ public class Shape : MonoBehaviour
         if (UIManager.Instance.shapeType == UIManager.ShapeType.None)
             return;
 
-        switch (UIManager.Instance.shapeType)
+        if (ShapeGameObject != null) 
         {
-            case UIManager.ShapeType.Sphere:
-                RotateAndMoveSphere(ANGLE);
-                break;
-            case UIManager.ShapeType.Rect:
-                RotateAndMoveRect(ANGLE);
-                break;
-            case UIManager.ShapeType.Hexagon:
-                RotateAndMoveHexagon(ANGLE);
-                break;
+            MoveAndRotateInterface FC = ShapeGameObject.GetComponent<MoveAndRotateInterface>();
+            FC.MoveAndRotate();
         }
-    }
-
-    void ChangeTransform(float Angle) 
-    {
-        if (Angle > 0)
-        {
-            if (CornerPosition[3].x > CornerPosition[3].x) 
-            {
-                CornerPosition[2] = Corners[2].transform.position;
-            }
-
-            if (CornerPosition[3].y >= CornerPosition[2].y) 
-            {
-                CornerPosition[3] = Corners[2].transform.position;
-                CornerPosition[2] = Corners[1].transform.position;
-            }
-        }
-        else 
-        {
-            if (CornerPosition[3].x < CornerPosition[2].x)
-            {
-                CornerPosition[2] = Corners[0].transform.position;
-            }
-
-            if (CornerPosition[3].y <= CornerPosition[2].y)
-            {
-                CornerPosition[3] = Corners[0].transform.position;
-                CornerPosition[0] = Corners[1].transform.position;
-            }
-        }
+        
     }
 }
