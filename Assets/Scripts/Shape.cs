@@ -106,7 +106,6 @@ public class Shape : MonoBehaviour
         moveAndRotateInterface.MoveAndRotate(10);
 
         DrawLineRenderer();
-        
-        
+       
     }
 }

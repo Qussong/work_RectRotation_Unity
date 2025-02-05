@@ -26,9 +26,11 @@ public class UIManager : MonoBehaviour
 
     [Header("Serial Ports")]
     [SerializeField] SerialPort serialPort;
-    bool[] sensors = new bool[61];
-    int currentSensingIndex = 0;
-    int previousSensingIndex = 0;
+    [SerializeField] bool[] sensors = new bool[61];
+    int currentLastSensingIndex = 0;
+    int currentStartSensingIndex = 0;
+    int previousStartSensingIndex = 0;
+    int previousLastSensingIndex = 0;
     byte[] buffer = new byte[1024];
 
     [Header("Game Succed")]
@@ -177,7 +179,8 @@ public class UIManager : MonoBehaviour
 
     void ReciveSignal() 
     {
-        previousSensingIndex = currentSensingIndex;
+        previousLastSensingIndex = currentLastSensingIndex;
+        previousStartSensingIndex = currentStartSensingIndex;
 
         int Bytes = CheckingSensors();
 
@@ -204,7 +207,13 @@ public class UIManager : MonoBehaviour
 
                         if (bit) 
                         {
-                            currentSensingIndex = bitIndex;
+
+                            if (currentStartSensingIndex > bitIndex) 
+                            {
+                                currentStartSensingIndex = bitIndex;
+                            }
+
+                            currentLastSensingIndex = bitIndex;
                         }
                     }
 
@@ -212,7 +221,7 @@ public class UIManager : MonoBehaviour
                 }
             }
 
-            if (previousSensingIndex == currentSensingIndex) 
+            if (previousLastSensingIndex == currentLastSensingIndex) 
             {
                 return;
             }
@@ -223,7 +232,7 @@ public class UIManager : MonoBehaviour
             }
             else 
             {
-                int Result = currentSensingIndex - previousSensingIndex;
+                int Result = currentSensingIndex - previousLastSensingIndex;
 
                 if (Result < 0)
                 {
