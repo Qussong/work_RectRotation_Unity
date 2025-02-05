@@ -18,16 +18,6 @@ public class InGameManager : MonoBehaviour
     [SerializeField] TimerManager timermanager;
     GameObject InstantiateGameObject;
 
-    private void Start()
-    {
-
-    }
-
-    private void Update()
-    {
-        
-    }
-
     private void OnDisable()
     {
         if (InstantiateGameObject != null) 

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
 
 public class RectRottation : MonoBehaviour, MoveAndRotateInterface
@@ -69,7 +70,6 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     void Update()
     {
-        MoveAndRotate(10);
 
     }
 
@@ -99,6 +99,18 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     public void MoveAndRotate(float Angle)
     {
+
+        if (Angle < 0)
+        {
+            rotationDirection = false;
+        }
+        else if (Angle > 0) 
+        {
+            rotationDirection = true;
+        }
+
+        rotationAnglePerSecond = Angle;
+
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
         {
@@ -133,6 +145,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
                 pivotPos = ModuloOperatorRight(pivotPos);
                 touchPos = ModuloOperatorRight(touchPos);
+
                 pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
                 touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
             }
@@ -140,6 +153,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         // Rotation Direction : left
         else
         {
+
             rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime);
 
             // When the TouchPoint touch ground
