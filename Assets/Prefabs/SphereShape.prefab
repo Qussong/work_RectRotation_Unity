@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 1039928925615708436}
   - component: {fileID: 3039365678523251429}
   - component: {fileID: 4647367616875464667}
+  - component: {fileID: 9004999962044871888}
   m_Layer: 5
   m_Name: SphereShape
   m_TagString: Shape
@@ -93,18 +94,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 930eb53407ee9b3428f6029a6dd6311f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EndPos: 0
-  CornerPosition:
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  - {x: 0, y: 0, z: 0}
-  Corners: []
-  LENGTH: 50
-  Speed: 3
   AutoMove: 0
+  StartPos: {x: 0, y: 0, z: 0}
+  EndPos: 0
   OutLineRenderUI: {fileID: 9005021284381045953}
   InLineRenderUI: {fileID: 6675178088172565338}
+  ShapeGameObject: {fileID: 0}
+--- !u!114 &9004999962044871888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 228251090293489993}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f4962c5ba01bdf94592318abade49403, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &331756722654769409
 GameObject:
   m_ObjectHideFlags: 0

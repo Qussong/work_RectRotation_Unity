@@ -20,18 +20,18 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
     [SerializeField] Image leftTopCorner = null;
     [SerializeField] Image rightTopCorner = null;
     [SerializeField] Image rightBottomCorner = null;
-    [SerializeField][Tooltip("»çÀÌÅ¬·ÎÀÌµå °î¼±À» ±ß´Â ¼±")] Image cycloidPoint = null;
-    [SerializeField][Tooltip("È¸Àü Áß½É Á¡")] Image pivotPoint = null;
-    [SerializeField][Tooltip("¹Ù´Ú Ãæµ¹ Á¡")] Image touchPoint = null;
+    [SerializeField][Tooltip("ì‚¬ì´í´ë¡œì´ë“œ ê³¡ì„ ì„ ê¸‹ëŠ” ì„ ")] Image cycloidPoint = null;
+    [SerializeField][Tooltip("íšŒì „ ì¤‘ì‹¬ ì ")] Image pivotPoint = null;
+    [SerializeField][Tooltip("ë°”ë‹¥ ì¶©ëŒ ì ")] Image touchPoint = null;
 
     [Header("Properties")]
-    [SerializeField][Tooltip("ÃÊ´ç È¸Àü °¢µµ (speed)")] float rotationAnglePerSecond = 0f;
-    [SerializeField][Tooltip("È¸Àü ¹æÇâ ( true : right(¡æ) , false : left(¡ç) )")] bool rotationDirection = true;
+    [SerializeField][Tooltip("ì´ˆë‹¹ íšŒì „ ê°ë„ (speed)")] float rotationAnglePerSecond = 0f;
+    [SerializeField][Tooltip("íšŒì „ ë°©í–¥ ( true : right(â†’) , false : left(â†) )")] bool rotationDirection = true;
     bool prevRotationDirection = true;
 
     [Header("Statuses")]
-    [SerializeField][Tooltip("½ÃÀÛ ÁöÁ¡")] Vector3 StartPoint = Vector3.zero;
-    [SerializeField][Tooltip("ÇöÀç È¸Àü·®")] float curRotation = 0f;
+    [SerializeField][Tooltip("ì‹œì‘ ì§€ì ")] Vector3 StartPoint = Vector3.zero;
+    [SerializeField][Tooltip("í˜„ì¬ íšŒì „ëŸ‰")] float curRotation = 0f;
     [SerializeField] int cycloidPos = -1;
     [SerializeField] int pivotPos = -1;
     [SerializeField] int touchPos = -1;
@@ -45,7 +45,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             null == rightTopCorner ||
             null == rightBottomCorner)
         {
-            throw new System.Exception("¼³Á¤ÀÌ ¿Ï·áµÇÁö ¾Ê¾Ò½À´Ï´Ù.");
+            throw new System.Exception("ì„¤ì •ì´ ì™„ë£Œë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤.");
         }
 
         corners[0] = leftBottomCorner;  // Corner.LB
@@ -67,6 +67,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
     void Update()
     {
         MoveAndRotate();
+
     }
 
     float InterpolationAngle(float angle)
@@ -93,7 +94,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         return nextValue;
     }
 
-    public void MoveAndRotate()
+    public void MoveAndRotate(float Angle)
     {
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
@@ -123,9 +124,9 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y < pivotPoint.transform.position.y)
             {
-                //rectImage.rectTransform.localRotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
                 //rectImage.rectTransform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
-                //Time.timeScale = 0;
+                curRotation = rectImage.rectTransform.rotation.eulerAngles.z;
+                transform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
 
                 pivotPos = ModuloOperatorRight(pivotPos);
                 touchPos = ModuloOperatorRight(touchPos);

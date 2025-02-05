@@ -110,16 +110,6 @@ public class UIManager : MonoBehaviour
         TestStartButton = false;
 
         LoadTitleUICoroutine = StartCoroutine(WaitForSecondsToLoadTitleUI());
-
-/*        if (shapeType == ShapeType.Sphere)
-        {
-            gameEnd.SetActive(true);
-        }
-        else 
-        {
-            LoadTitleUI();
-        }*/
-
     }
 
     IEnumerator WaitForSecondsToLoadTitleUI() 
