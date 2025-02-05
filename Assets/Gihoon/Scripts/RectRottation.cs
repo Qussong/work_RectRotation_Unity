@@ -66,7 +66,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     void Update()
     {
-
+        MoveAndRotate();
     }
 
     float InterpolationAngle(float angle)
@@ -93,7 +93,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         return nextValue;
     }
 
-    void MoveAndRotateInterface.MoveAndRotate()
+    public void MoveAndRotate()
     {
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
