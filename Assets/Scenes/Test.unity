@@ -1240,7 +1240,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4647367616875464667, guid: 86b8f521d70991948b056d6928b67ff3, type: 3}
       propertyPath: EndPos
-      value: 1800
+      value: 2000
       objectReference: {fileID: 0}
     - target: {fileID: 4647367616875464667, guid: 86b8f521d70991948b056d6928b67ff3, type: 3}
       propertyPath: AutoMove
