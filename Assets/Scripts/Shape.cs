@@ -75,6 +75,7 @@ public class Shape : MonoBehaviour
            {
                moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
            }
+
            moveAndRotateInterface.MoveAndRotate(20);
            
             if (transform.localPosition.x >= EndPos)
