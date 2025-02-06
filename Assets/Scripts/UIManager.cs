@@ -59,22 +59,22 @@ public class UIManager : MonoBehaviour
         {
             Instance = this;
         }
-        else 
+        else
         {
             Destroy(Instance);
         }
 
         LoadTitleUI();
 
-        foreach (var Name in SerialPort.GetPortNames()) 
+        foreach (var Name in SerialPort.GetPortNames())
         {
-            if (Name == "COM3") 
+            if (Name == "COM3")
             {
                 serialPort = new SerialPort("COM3", 9600);
             }
         }
 
-        if (serialPort == null || serialPort.PortName != "COM3") 
+        if (serialPort == null || serialPort.PortName != "COM3")
         {
             Debug.Log("Serial Port Is Null");
             return;
@@ -95,6 +95,7 @@ public class UIManager : MonoBehaviour
             if (serialPort.IsOpen && !isGameEnd)
             {
                 ReciveSignal();
+                CheckArray();
             }
         }
 
@@ -118,7 +119,7 @@ public class UIManager : MonoBehaviour
 
     }
 
-    public void LoadGameEndUI() 
+    public void LoadGameEndUI()
     {
         title.SetActive(false);
         gameEnd.SetActive(true);
@@ -131,7 +132,7 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-            if (shapeType == ShapeType.Sphere) 
+            if (shapeType == ShapeType.Sphere)
             {
                 gameEndUI.ShowUI(GameEndUI.UIType.SphereEnd);
                 inGame.SetActive(false);
@@ -148,26 +149,26 @@ public class UIManager : MonoBehaviour
         TestStartButton = false;
     }
 
-    IEnumerator CheckNextShapeInsert() 
+    IEnumerator CheckNextShapeInsert()
     {
         yield return new WaitForSecondsRealtime(5.0f);
 
         float ResetTimer = 0;
 
-        while (CheckingSensors() > 0) 
+        while (CheckingSensors() > 0)
         {
             ResetTimer += 1.0f;
 
             yield return new WaitForSecondsRealtime(1.0f);
 
-            if (ResetTimer <= 10.0f) 
+            if (ResetTimer <= 10.0f)
             {
                 LoadTitleUI();
                 ResetTimer = 0.0f;
                 yield break;
             }
 
-            if (CheckingSensors() < 0) 
+            if (CheckingSensors() < 0)
             {
                 LoadInGameUI();
                 yield break;
@@ -177,13 +178,13 @@ public class UIManager : MonoBehaviour
         LoadInGameUI();
     }
 
-    IEnumerator WaitForSecondsToLoadTitleUI() 
+    IEnumerator WaitForSecondsToLoadTitleUI()
     {
         yield return new WaitForSecondsRealtime(10.0f);
         LoadTitleUI();
     }
 
-    void LoadInGameUI() 
+    void LoadInGameUI()
     {
         SettingShape();
         gameManager.GameStart();
@@ -193,7 +194,7 @@ public class UIManager : MonoBehaviour
         inGame.SetActive(true);
     }
 
-    void LoadPleaseTakeOutShapeUI() 
+    void LoadPleaseTakeOutShapeUI()
     {
         if (!pleaseTakeOutShapeUI.activeSelf)
         {
@@ -201,7 +202,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void UnloadPleaseTakeOutShapeUI() 
+    void UnloadPleaseTakeOutShapeUI()
     {
         if (pleaseTakeOutShapeUI.activeSelf)
         {
@@ -209,7 +210,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    IEnumerator CheckingTakeOutShape() 
+    IEnumerator CheckingTakeOutShape()
     {
         IsPlayTakeOutShapeCoroutine = true;
 
@@ -226,7 +227,7 @@ public class UIManager : MonoBehaviour
         IsPlayTakeOutShapeCoroutine = false;
     }
 
-    public int CheckingSensors() 
+    public int CheckingSensors()
     {
         if (serialPort == null)
             return -1;
@@ -240,10 +241,8 @@ public class UIManager : MonoBehaviour
         return serialPort.ReadByte();
     }
 
-    void ReciveSignal() 
+    void ReciveSignal()
     {
-        previousLastSensingIndex = currentLastSensingIndex;
-        previousStartSensingIndex = currentStartSensingIndex;
 
         int Bytes = CheckingSensors();
 
@@ -268,15 +267,12 @@ public class UIManager : MonoBehaviour
                     {
                         sensors[bitIndex] = bit;
 
-                        if (bit) 
+                        if (bit == true)
                         {
-
-                            if (currentStartSensingIndex > bitIndex) 
+                            if (currentStartSensingIndex > bitIndex)
                             {
                                 currentStartSensingIndex = bitIndex;
                             }
-
-                            currentLastSensingIndex = bitIndex;
                         }
                     }
 
@@ -284,21 +280,36 @@ public class UIManager : MonoBehaviour
                 }
             }
 
-            if (previousLastSensingIndex == currentLastSensingIndex) 
-            {
-                Debug.Log("Data Not Changed");
-                return;
-            }
-
-            if (currentLastSensingIndex - currentStartSensingIndex > 8) 
-            {
-                Debug.Log("Insert at last two shape");
-                return;
-            }
-
-            int Result = currentLastSensingIndex - previousLastSensingIndex;
-            shape.UpdateRotateAndLocation(33 * Result);
         }
+    }
+
+    void CheckArray() 
+    {
+        previousLastSensingIndex = currentLastSensingIndex;
+        previousStartSensingIndex = currentStartSensingIndex;
+
+        for (int i = 0; i < sensors.Length; ++i) 
+        {
+            if (sensors[i] == true)
+            {
+                currentLastSensingIndex = i;
+            }
+        }
+
+        if (previousLastSensingIndex == currentLastSensingIndex)
+        {
+            Debug.Log("Data Not Changed");
+            return;
+        }
+
+        if (currentLastSensingIndex - currentStartSensingIndex > 8)
+        {
+            Debug.Log("Insert at last two shape");
+            return;
+        }
+
+        int Result = currentLastSensingIndex - previousLastSensingIndex;
+        shape.UpdateRotateAndLocation(Result);
     }
 
     void TestFunction() 
@@ -312,11 +323,11 @@ public class UIManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.D))
         {
-            shape.UpdateRotateAndLocation(1);
+            shape.UpdateRotateAndLocation(5);
         }
         else if (Input.GetKeyDown(KeyCode.A)) 
         {
-            shape.UpdateRotateAndLocation(-1);
+            shape.UpdateRotateAndLocation(-5);
         }
     }
 

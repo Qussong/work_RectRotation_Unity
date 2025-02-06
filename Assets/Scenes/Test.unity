@@ -3223,7 +3223,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee607e2dc15b33a40aff81b1911f1486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectImage: {fileID: 3039365677781951515}
+  ownerImage: {fileID: 3039365677781951515}
   leftBottomCorner: {fileID: 2651428887847240141}
   leftTopCorner: {fileID: 362033671134736131}
   rightTopCorner: {fileID: 6777068913497140598}
