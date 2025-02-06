@@ -114,7 +114,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee607e2dc15b33a40aff81b1911f1486, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  rectImage: {fileID: 3039365678523251429}
+  ownerImage: {fileID: 3039365678523251429}
   leftBottomCorner: {fileID: 2651428888580284211}
   leftTopCorner: {fileID: 362033670802256381}
   rightTopCorner: {fileID: 6777068912619533192}
