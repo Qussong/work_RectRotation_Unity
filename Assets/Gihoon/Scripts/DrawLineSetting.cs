@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using NUnit.Compatibility;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.UI.Extensions;
@@ -7,20 +8,18 @@ using UnityEngine.UI.Extensions;
 public class DrawLineSetting : MonoBehaviour
 {
     UILineRenderer uiLineRenderer = null;
-    Image owner = null;
+    GameObject owner = null;
 
-    // Start is called before the first frame update
     void Start()
     {
         uiLineRenderer = GetComponent<UILineRenderer>();
         if(null != uiLineRenderer)
         {
-            Vector3 startPos = owner.rectTransform.localPosition;
+            //Vector3 startPos = owner.rectTransform.localPosition;
                    
         }
     }
 
-    // Update is called once per frame
     void Update()
     {
         
