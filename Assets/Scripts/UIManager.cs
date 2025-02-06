@@ -144,6 +144,7 @@ public class UIManager : MonoBehaviour
             }
         }
 
+        isGameEnd = false;
         TestStartButton = false;
     }
 
@@ -220,7 +221,6 @@ public class UIManager : MonoBehaviour
             yield return new WaitForSecondsRealtime(1.0f);
         }
 
-        isGameEnd = false;
         UnloadPleaseTakeOutShapeUI();
         LoadGameEndUI();
         IsPlayTakeOutShapeCoroutine = false;
@@ -297,15 +297,7 @@ public class UIManager : MonoBehaviour
             }
 
             int Result = currentLastSensingIndex - previousLastSensingIndex;
-
-            if (Result < 0)
-            {
-                shape.UpdateRotateAndLocation(-10);
-            }
-            else 
-            {
-                shape.UpdateRotateAndLocation(10);
-            }
+            shape.UpdateRotateAndLocation(33 * Result);
         }
     }
 
@@ -318,13 +310,13 @@ public class UIManager : MonoBehaviour
             LoadInGameUI();
         }
 
-        if (Input.GetKey(KeyCode.D))
+        if (Input.GetKeyDown(KeyCode.D))
         {
-            shape.UpdateRotateAndLocation(55f);
+            shape.UpdateRotateAndLocation(1);
         }
-        else if (Input.GetKey(KeyCode.A)) 
+        else if (Input.GetKeyDown(KeyCode.A)) 
         {
-            shape.UpdateRotateAndLocation(-55f);
+            shape.UpdateRotateAndLocation(-1);
         }
     }
 
