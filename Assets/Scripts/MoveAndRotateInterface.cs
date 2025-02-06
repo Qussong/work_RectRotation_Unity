@@ -4,6 +4,6 @@ using UnityEngine;
 
 public interface MoveAndRotateInterface
 {
-    void MoveAndRotate(float Angle);
+    void MoveAndRotate(int sensorDist);
     void InitPivotPoint();
 }

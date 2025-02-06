@@ -7,6 +7,8 @@ using UnityEngine.UI;
 
 public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 {
+    Shape shape = null;
+
     public enum CornerName
     {
         LB, // LeftBottom (0)
@@ -24,6 +26,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
     [SerializeField][Tooltip("사이클로이드 곡선을 긋는 선")] Image cycloidPoint = null;
     [SerializeField][Tooltip("회전 중심 점")] Image pivotPoint = null;
     [SerializeField][Tooltip("바닥 충돌 점")] Image touchPoint = null;
+    private float sideLength = 0;
 
     [Header("Properties")]
     [SerializeField][Tooltip("초당 회전 각도 (speed)")] float rotationAnglePerSecond = 0f;
@@ -65,7 +68,10 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         */
         InitPivotPoint();
 
-        rotationAnglePerSecond = 50;
+        sideLength = rectImage.rectTransform.rect.width;
+        rotationAnglePerSecond = (33 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
+
+        shape = GetComponent<Shape>();
     }
 
     void Update()
@@ -97,19 +103,19 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         return nextValue;
     }
 
-    public void MoveAndRotate(float Angle)
+    public void MoveAndRotate(int sensorDist)
     {
 
-        if (Angle < 0)
+        if (sensorDist < 0)
         {
             rotationDirection = false;
         }
-        else if (Angle > 0) 
+        else if (sensorDist > 0) 
         {
             rotationDirection = true;
         }
 
-        rotationAnglePerSecond = Angle;
+        //rotationAnglePerSecond = sensorDist;
 
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
@@ -134,7 +140,14 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         // Rotation Direction : right
         if (rotationDirection)
         {
-            rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime);
+            if (shape != null && shape.AutoMove == true)
+            {
+                rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+            }
+            else
+            {
+                rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond)/* * Time.deltaTime*/ * sensorDist);
+            }
 
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y < pivotPoint.transform.position.y)
@@ -153,8 +166,15 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         // Rotation Direction : left
         else
         {
+            if(shape != null && shape.AutoMove == true)
+            {
+                rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+            }
+            else
+            {
+                rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) /** Time.deltaTime*/ * sensorDist);
+            }
 
-            rectImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime);
 
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
