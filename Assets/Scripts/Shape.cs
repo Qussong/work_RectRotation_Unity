@@ -25,7 +25,7 @@ public class Shape : MonoBehaviour
     }
 
     [Header("Title Rect Property")]
-    [SerializeField] bool AutoMove = false;
+    [SerializeField] public bool AutoMove = false;
     [SerializeField] Vector3 StartPos;
     [SerializeField] float EndPos;
 
@@ -37,6 +37,16 @@ public class Shape : MonoBehaviour
 
     LineRenderer outlineRenderer;
     LineRenderer InlineRenderer;
+
+    private void OnDisable()
+    {
+        if (AutoMove)
+        {
+            transform.localPosition = StartPos;
+            transform.rotation = Quaternion.identity;
+        }
+    }
+
     void Start()
     {
         StartPos = transform.localPosition;
@@ -61,13 +71,11 @@ public class Shape : MonoBehaviour
     {
         if (AutoMove) 
         {
-
            if (moveAndRotateInterface == null)
            {
                moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
            }
-
-           moveAndRotateInterface.MoveAndRotate(80);
+           moveAndRotateInterface.MoveAndRotate(20);
            
             if (transform.localPosition.x >= EndPos)
             {
@@ -80,7 +88,7 @@ public class Shape : MonoBehaviour
         }
     }
 
-    public void UpdateRotateAndLocation(float ANGLE) 
+    public void UpdateRotateAndLocation(int sensorDist) 
     {
         if (UIManager.Instance.shapeType == UIManager.ShapeType.None)
             return;
@@ -90,6 +98,6 @@ public class Shape : MonoBehaviour
             moveAndRotateInterface = gameObject.GetComponent<MoveAndRotateInterface>();
         }
 
-        moveAndRotateInterface.MoveAndRotate(ANGLE);
+        moveAndRotateInterface.MoveAndRotate(sensorDist);
     }
 }

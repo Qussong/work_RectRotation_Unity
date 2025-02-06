@@ -5,6 +5,7 @@ using UnityEngine;
 public class GoalManager : MonoBehaviour
 {
     [SerializeField] bool EnterToGoal = false;
+    [SerializeField] TimerManager timermanager;
 
     public Shape Shape;
 
@@ -25,6 +26,11 @@ public class GoalManager : MonoBehaviour
                 {
                     EnterToGoal = false;
                     UIManager.Instance.isGameEnd = true;
+
+                    if (timermanager != null) 
+                    {
+                        timermanager.start = false;
+                    }
                 }
             }
         }
