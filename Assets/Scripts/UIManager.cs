@@ -6,6 +6,7 @@ using static UIManager;
 using System.Configuration;
 using NUnit.Framework.Constraints;
 using System.Threading;
+using DG.Tweening.Core.Easing;
 
 public class UIManager : MonoBehaviour
 {

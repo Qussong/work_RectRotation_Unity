@@ -30,8 +30,8 @@ public class Shape : MonoBehaviour
     [SerializeField] float EndPos;
 
     [Header("Line Render")]
-    [SerializeField] RectTransform OutLineRenderUI;
-    [SerializeField] RectTransform InLineRenderUI;
+    [SerializeField] public RectTransform OutLineRenderUI;
+    [SerializeField] public RectTransform InLineRenderUI;
 
     [SerializeField] MoveAndRotateInterface moveAndRotateInterface;
 

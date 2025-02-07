@@ -32,7 +32,7 @@ public class UILineBrushMove : MonoBehaviour
         if (null == rectTrasnform)
             return;
 
-        Move();
+        //Move();
     }
 
     private void Move()
