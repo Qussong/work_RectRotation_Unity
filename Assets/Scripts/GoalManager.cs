@@ -6,6 +6,7 @@ public class GoalManager : MonoBehaviour
 {
     [SerializeField] bool EnterToGoal = false;
     [SerializeField] TimerManager timermanager;
+    [SerializeField] float offset;
 
     public Shape Shape;
 
@@ -20,7 +21,7 @@ public class GoalManager : MonoBehaviour
             if (Shape != null)
             {
                 float ShapeXPosition = Shape.gameObject.transform.position.x;
-                float GoalXPosition = transform.position.x;
+                float GoalXPosition = transform.position.x - offset;
 
                 if (ShapeXPosition > GoalXPosition)
                 {

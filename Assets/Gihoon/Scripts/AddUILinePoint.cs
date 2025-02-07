@@ -10,8 +10,10 @@ public class AddUILinePoint : MonoBehaviour
     [Header("Essential Settings")]
     [SerializeField] GameObject anchor = null;
 
+
     UILineRenderer uiLineRenderer = null;
-    RectTransform rectTransform = null;
+    public RectTransform targetRectTransform = null;
+    RectTransform BrushRectTransform = null;
     List<Vector2> points = new List<Vector2>();
 
     void Start()
@@ -23,12 +25,14 @@ public class AddUILinePoint : MonoBehaviour
         }
 
         uiLineRenderer = anchor.GetComponent<UILineRenderer>();
+
         if (null != uiLineRenderer)
         {
-            rectTransform = GetComponent<RectTransform>();
-            if (rectTransform != null)
+            BrushRectTransform = GetComponent<RectTransform>();
+
+            if (targetRectTransform != null)
             {
-                Vector2 startPos = rectTransform.localPosition;
+                transform.position = targetRectTransform.position;
             }
             else
             {
@@ -39,7 +43,15 @@ public class AddUILinePoint : MonoBehaviour
 
     void Update()
     {
-        AddPoint(rectTransform.localPosition);
+        if (UIManager.Instance.isGameEnd) 
+        {
+            transform.position = anchor.transform.position;
+            points.Clear();
+        }
+
+        transform.position = targetRectTransform.position;
+
+        AddPoint(transform.localPosition);
     }
 
     public void AddPoint(Vector2 newPoint)
