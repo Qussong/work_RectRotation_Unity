@@ -100,10 +100,6 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         {
             throw new System.Exception("객체가 설정되지 않았습니다.");
         }
-        else
-        {
-
-        }
 
         // Status 초기화
         startPosition = ownerImage.rectTransform.localPosition;
@@ -122,11 +118,6 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         rotationAnglePerSecond = 1f;
 
         shape = GetComponent<Shape>();
-    }
-
-    void Update()
-    {
-        
     }
 
     // 현재 회전각을 60도의 배수로 스냅하는 함수 (육각형 기준)
@@ -185,11 +176,11 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         {
             if (shape != null && shape.AutoMove == true)
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist * 50);
             }
             else
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist * 50);
             }
 
             // 터치 포인트가 피벗 포인트의 수평 위치보다 아래로 내려가면 회전 보정 및 피벗/터치 위치 갱신
@@ -214,11 +205,11 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         {
             if (shape != null && shape.AutoMove == true)
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist * 50);
             }
             else
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * sensorDist * 50);
             }
 
             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
