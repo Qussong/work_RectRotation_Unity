@@ -51,7 +51,10 @@ public class InGameManager : MonoBehaviour
                 goalimage.sprite = goalSprites[2];
                 InstantiateGameObject = Instantiate(shapes[2], StartPos, Quaternion.identity, transform);
                 break;
+            case UIManager.ShapeType.Max:
+                return;
         }
+
 
         UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
         goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();

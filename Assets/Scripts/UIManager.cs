@@ -19,7 +19,8 @@ public class UIManager : MonoBehaviour
         None,
         Sphere,
         Rect,
-        Hexagon
+        Hexagon,
+        Max
     }
 
     public enum GameState
@@ -57,6 +58,7 @@ public class UIManager : MonoBehaviour
     [Header("Game Status")]
     public bool isGameEnd = false;
     public bool IsTimeOut = false;
+    float CheckingTime = 0.0f;
     public ShapeType shapeType;
     bool isCheckingShape;
 
@@ -119,7 +121,7 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        CheckArray();
+        CheckArray();      
     }
 
     public void LoadTitleUI()
@@ -163,8 +165,6 @@ public class UIManager : MonoBehaviour
         insertNewShapeUI.SetActive(true);
         isGameEnd = false;
         IsTimeOut = false;
-        Debug.Log("Game End : " + isGameEnd);
-        Debug.Log("TimeOut " + IsTimeOut);
     }
 
     void UnloadInsertNewShapeUI() 
@@ -174,6 +174,9 @@ public class UIManager : MonoBehaviour
 
     void LoadInGameUI()
     {
+        if (shapeType == ShapeType.Max)
+            return;
+
         UnloadInsertNewShapeUI();
         currnetGameState = GameState.InGame;
         SettingShape();
@@ -207,7 +210,6 @@ public class UIManager : MonoBehaviour
 
     IEnumerator CheckingTakeOutShape()
     {
-
         isCheckingShape = true;
 
         yield return new WaitForSecondsRealtime(5.0f);
@@ -222,11 +224,9 @@ public class UIManager : MonoBehaviour
                 {
                     isShapeDetected = true;
 
-                    if (!WrongShapeUI.activeSelf)
-                    {
-                        LoadPleaseTakeOutShapeUI();
-                        break;
-                    }
+                    LoadPleaseTakeOutShapeUI();
+                    break;
+
                 }
                 
             }
@@ -238,18 +238,16 @@ public class UIManager : MonoBehaviour
                     UnloadPleaseTakeOutShapeUI();
                     LoadInsertNewShapeUI();
                     isCheckingShape = false;
-                    break;
-                }
-                else if (WrongShapeUI.activeSelf) 
-                {
-                    UnloadWrongShapeUI();                    
+                    yield break;
                 }
                 else
                 {
                     UnloadPleaseTakeOutShapeUI();
                     LoadTitleUI();
+                    yield break;
                 }
             }
+
             yield return new WaitForSecondsRealtime(0.5f);
         }
     }
@@ -273,8 +271,6 @@ public class UIManager : MonoBehaviour
 
         Result = previousLastSensingIndex - currentLastSensingIndex;
 
-        Debug.Log(Result);
-
         if (isGameEnd)
             return;
 
@@ -290,7 +286,7 @@ public class UIManager : MonoBehaviour
                 shape.UpdateRotateAndLocation(Result);
             }
         }
-        else if (insertNewShapeUI.activeSelf && isAnySensorActive) 
+        else if (insertNewShapeUI.activeSelf && isAnySensorActive)
         {
             LoadInGameUI();
         }
@@ -302,11 +298,11 @@ public class UIManager : MonoBehaviour
         {
             if (currentLastSensingIndex == RectIndex)
                 shapeType = ShapeType.Rect;
-            else if (currentLastSensingIndex == HexagonIndex)
+            else if (currentLastSensingIndex >= HexagonIndex)
                 shapeType = ShapeType.Hexagon;
             else
             {
-                shapeType = ShapeType.None;
+                shapeType = ShapeType.Max;
                 LoadWrongShapeUI();
             }
         }

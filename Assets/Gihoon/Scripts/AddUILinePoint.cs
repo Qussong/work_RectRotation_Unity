@@ -50,6 +50,9 @@ public class AddUILinePoint : MonoBehaviour
             points.Clear();
         }
 
+        if (UIManager.Instance.shapeType == UIManager.ShapeType.Max || UIManager.Instance.shapeType == UIManager.ShapeType.None)
+            return;
+
         transform.position = targetRectTransform.position;
 
         AddPoint(transform.localPosition);
