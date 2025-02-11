@@ -7,6 +7,7 @@ using UnityEngine.UI.Extensions;
 
 public class AddUILinePoint : MonoBehaviour
 {
+
     [Header("Essential Settings")]
     [SerializeField] GameObject anchor = null;
 

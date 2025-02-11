@@ -5,37 +5,29 @@ using UnityEngine;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
+    
     public void MoveAndRotate(int sensorDist) 
     {
-        /*float angleRad = Angle * Mathf.Deg2Rad;
-        float radius = 0.5f;
+        Debug.Log(sensorDist);
 
-        Angle /= Angle;
-        float moveDistance = Angle * 33;
-
-        transform.Translate(new Vector3(33, 0, 0), Space.World);
-        transform.Rotate(0, 0, Angle);*/
-
-        MoveSphere(sensorDist);
-    }
-    private void MoveSphere(int sensorDist)
-    {
         float radius = 0.5f;
         float ratio = 33 / 2 * Mathf.PI * radius;
         float rotationAngle = 360 * ratio;
+        int amount = Mathf.Abs(sensorDist);
+        Vector3 targetPosition = new Vector3(0, 0, 0);
 
-        if (sensorDist > 0)
+        if (sensorDist < 0)
         {
-            transform.Translate(new Vector3(33 * sensorDist, 0, 0), Space.World);
+            targetPosition.x = 50 * amount;
+            transform.Translate(targetPosition, Space.World);
             transform.Rotate(0, 0, -rotationAngle);
         }
         else
         {
-            transform.Translate(new Vector3(-33 * sensorDist, 0, 0), Space.World);
+            targetPosition.x = -50 * amount;
+            transform.Translate(targetPosition, Space.World);
             transform.Rotate(0, 0, rotationAngle);
         }
-
-
     }
 
     public void InitPivotPoint()

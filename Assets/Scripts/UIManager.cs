@@ -7,6 +7,10 @@ using System.Configuration;
 using NUnit.Framework.Constraints;
 using System.Threading;
 using DG.Tweening.Core.Easing;
+using NUnit.Framework.Interfaces;
+using System;
+using System.Threading.Tasks;
+using System.IO.IsolatedStorage;
 
 public class UIManager : MonoBehaviour
 {
@@ -18,6 +22,13 @@ public class UIManager : MonoBehaviour
         Hexagon
     }
 
+    public enum GameState
+    {
+        Title,
+        InGame,
+        End
+    }
+
     public static UIManager Instance;
 
     [Header("UIs")]
@@ -25,8 +36,11 @@ public class UIManager : MonoBehaviour
     [SerializeField] GameObject gameEnd;
     [SerializeField] GameObject inGame;
     [SerializeField] GameObject pleaseTakeOutShapeUI;
+    [SerializeField] GameObject insertNewShapeUI;
+    [SerializeField] GameObject WrongShapeUI;
     [SerializeField] InGameManager gameManager;
     [SerializeField] GameEndUI gameEndUI;
+    [SerializeField] GameState currnetGameState;
     public Shape shape;
 
     [Header("Serial Ports")]
@@ -36,157 +50,132 @@ public class UIManager : MonoBehaviour
     int currentStartSensingIndex = 0;
     int previousStartSensingIndex = 0;
     int previousLastSensingIndex = 0;
-    byte[] buffer = new byte[1024];
+    public int baudRate = 9600; // 시리얼 통신 속도
+    private byte[] receivedBytes = new byte[19]; // 5바이트 데이터 저장용
+    private byte[] latestData = new byte[19];    // 최신 데이터 저장용
 
     [Header("Game Status")]
     public bool isGameEnd = false;
     public bool IsTimeOut = false;
     public ShapeType shapeType;
+    bool isCheckingShape;
 
     [Header("Shape Setting")]
     [Tooltip("하단의 값을 변경하면 센서 배열의 해당 인덱스 값이 감지된 결과를 바탕으로 설정된 도형으로 인식합니다.")]
     [SerializeField] int RectIndex = 1;
     [SerializeField] int HexagonIndex = 2;
+    [SerializeField] string[] portNames;
+    [SerializeField] string portName;
 
-    [Header("Test")]
-    public bool TestStartButton = false;
-
-    bool IsPlayTakeOutShapeCoroutine = false;
-
-
-    private void Start()
+    void Awake()
     {
         if (Instance == null)
-        {
             Instance = this;
+        else
+            Destroy(Instance);
+
+        portNames = SerialPort.GetPortNames();
+
+        if (portNames.Length > 0)
+        {
+            string selectedPort = "";
+
+            foreach (var port in portNames)
+            {
+                Debug.Log("Port Name : " + port);
+
+                if (port != "COM1" && port != "LP1")
+                {
+                    selectedPort = port;
+                    Debug.Log(port);
+                    break;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(selectedPort))
+                portName = selectedPort;
+            else
+                Debug.Log("Not Connection");
+
         }
         else
-        {
-            Destroy(Instance);
-        }
+            Debug.LogWarning("No serial ports found.");
 
         LoadTitleUI();
 
-        foreach (var Name in SerialPort.GetPortNames())
-        {
-            if (Name == "COM3")
-            {
-                serialPort = new SerialPort("COM3", 9600);
-            }
-        }
 
-        if (serialPort == null || serialPort.PortName != "COM3")
+    }
+    async void Start()
+    {
+        if (string.IsNullOrEmpty(portName))
         {
-            Debug.Log("Serial Port Is Null");
+            Debug.LogError("Port name is empty. Cannot initialize serial port.");
             return;
         }
 
-        serialPort.Open();
+        InitializeSerialPort();
+        await StartListening(); // 비동기 데이터 수신 시작
     }
 
     private void Update()
     {
-        if (TestStartButton && !isGameEnd)
-        {
-            TestFunction();
-        }
-
-        if (serialPort != null)
-        {
-            if (serialPort.IsOpen && !isGameEnd)
-            {
-                ReciveSignal();
-                CheckArray();
-            }
-        }
-
-        if (isGameEnd)
-        {
-            if (!IsPlayTakeOutShapeCoroutine)
-            {
-                StartCoroutine(CheckingTakeOutShape());
-            }
-        }
+        CheckArray();
     }
 
     public void LoadTitleUI()
     {
+        currnetGameState = GameState.Title;
         isGameEnd = false;
         shapeType = ShapeType.None;
         title.SetActive(true);
         gameEnd.SetActive(false);
         inGame.SetActive(false);
+        IsTimeOut = false;
         StopAllCoroutines();
 
     }
 
     public void LoadGameEndUI()
     {
+        StartCoroutine(CheckingTakeOutShape());
+        isGameEnd = true;
+        currnetGameState = GameState.End;
         title.SetActive(false);
         gameEnd.SetActive(true);
+        inGame.SetActive(false);
 
         if (IsTimeOut)
         {
-            IsTimeOut = false;
             gameEndUI.ShowUI(GameEndUI.UIType.MissionFail);
-            StartCoroutine(WaitForSecondsToLoadTitleUI());
+        }
+        else if(shapeType == ShapeType.Sphere)
+        {
+            gameEndUI.ShowUI(GameEndUI.UIType.SphereEnd);
         }
         else
         {
-            if (shapeType == ShapeType.Sphere)
-            {
-                gameEndUI.ShowUI(GameEndUI.UIType.SphereEnd);
-                inGame.SetActive(false);
-                StartCoroutine(CheckNextShapeInsert());
-            }
-            else
-            {
-                gameEndUI.ShowUI(GameEndUI.UIType.MissionSucceed);
-                StartCoroutine(WaitForSecondsToLoadTitleUI());
-            }
+            gameEndUI.ShowUI(GameEndUI.UIType.MissionSucceed);
         }
+    }
 
+    void LoadInsertNewShapeUI()
+    {
+        insertNewShapeUI.SetActive(true);
         isGameEnd = false;
-        TestStartButton = false;
+        IsTimeOut = false;
+        Debug.Log("Game End : " + isGameEnd);
+        Debug.Log("TimeOut " + IsTimeOut);
     }
 
-    IEnumerator CheckNextShapeInsert()
+    void UnloadInsertNewShapeUI() 
     {
-        yield return new WaitForSecondsRealtime(5.0f);
-
-        float ResetTimer = 0;
-
-        while (CheckingSensors() > 0)
-        {
-            ResetTimer += 1.0f;
-
-            yield return new WaitForSecondsRealtime(1.0f);
-
-            if (ResetTimer <= 10.0f)
-            {
-                LoadTitleUI();
-                ResetTimer = 0.0f;
-                yield break;
-            }
-
-            if (CheckingSensors() < 0)
-            {
-                LoadInGameUI();
-                yield break;
-            }
-        }
-
-        LoadInGameUI();
-    }
-
-    IEnumerator WaitForSecondsToLoadTitleUI()
-    {
-        yield return new WaitForSecondsRealtime(10.0f);
-        LoadTitleUI();
+        insertNewShapeUI.SetActive(false);
     }
 
     void LoadInGameUI()
     {
+        UnloadInsertNewShapeUI();
+        currnetGameState = GameState.InGame;
         SettingShape();
         gameManager.GameStart();
         isGameEnd = false;
@@ -197,155 +186,221 @@ public class UIManager : MonoBehaviour
 
     void LoadPleaseTakeOutShapeUI()
     {
-        if (!pleaseTakeOutShapeUI.activeSelf)
-        {
-            pleaseTakeOutShapeUI.SetActive(true);
-        }
+        pleaseTakeOutShapeUI.SetActive(true);
     }
 
     void UnloadPleaseTakeOutShapeUI()
     {
-        if (pleaseTakeOutShapeUI.activeSelf)
-        {
-            pleaseTakeOutShapeUI.SetActive(false);
-        }
+        pleaseTakeOutShapeUI.SetActive(false);
+    }
+
+    void LoadWrongShapeUI()
+    {
+        WrongShapeUI.SetActive(true);
+        StartCoroutine(CheckingTakeOutShape());
+    }
+
+    void UnloadWrongShapeUI()
+    {
+        WrongShapeUI.SetActive(false);
     }
 
     IEnumerator CheckingTakeOutShape()
     {
-        IsPlayTakeOutShapeCoroutine = true;
 
-        yield return new WaitForSecondsRealtime(2.0f);
+        isCheckingShape = true;
 
-        while (CheckingSensors() > 0)
+        yield return new WaitForSecondsRealtime(5.0f);
+
+        while (true)
         {
-            LoadPleaseTakeOutShapeUI();
-            yield return new WaitForSecondsRealtime(1.0f);
-        }
+            bool isShapeDetected = false;
 
-        UnloadPleaseTakeOutShapeUI();
-        LoadGameEndUI();
-        IsPlayTakeOutShapeCoroutine = false;
-    }
-
-    public int CheckingSensors()
-    {
-        if (serialPort == null)
-            return -1;
-
-        if (!serialPort.IsOpen)
-        {
-            Debug.Log("Serial Port Is Not Open");
-            return -1;
-        }
-
-        return serialPort.ReadByte();
-    }
-
-    void ReciveSignal()
-    {
-
-        int Bytes = CheckingSensors();
-
-        if (Bytes > 0)
-        {
-            serialPort.Read(buffer, 0, Bytes);
-
-            int bitIndex = 0;
-
-            for (int i = 1; i < 9; ++i)
+            foreach (var sensor in sensors)
             {
-                for (int j = 7; j <= 0; --j)
+                if (sensor)
                 {
-                    if (i == 1)
+                    isShapeDetected = true;
+
+                    if (!WrongShapeUI.activeSelf)
                     {
-                        j = 4;
+                        LoadPleaseTakeOutShapeUI();
+                        break;
                     }
-
-                    bool bit = (buffer[i] & (1 << j)) != 0;
-
-                    if (bitIndex < sensors.Length)
-                    {
-                        sensors[bitIndex] = bit;
-
-                        if (bit == true)
-                        {
-                            if (currentStartSensingIndex > bitIndex)
-                            {
-                                currentStartSensingIndex = bitIndex;
-                            }
-                        }
-                    }
-
-                    bitIndex++;
                 }
+                
             }
 
+            if (!isShapeDetected)
+            {
+                if (shapeType == ShapeType.Sphere && !IsTimeOut)
+                {
+                    UnloadPleaseTakeOutShapeUI();
+                    LoadInsertNewShapeUI();
+                    isCheckingShape = false;
+                    break;
+                }
+                else if (WrongShapeUI.activeSelf) 
+                {
+                    UnloadWrongShapeUI();                    
+                }
+                else
+                {
+                    UnloadPleaseTakeOutShapeUI();
+                    LoadTitleUI();
+                }
+            }
+            yield return new WaitForSecondsRealtime(0.5f);
         }
     }
 
-    void CheckArray() 
+    void CheckArray()
     {
-        previousLastSensingIndex = currentLastSensingIndex;
         previousStartSensingIndex = currentStartSensingIndex;
+        previousLastSensingIndex = currentLastSensingIndex;
 
-        for (int i = 0; i < sensors.Length; ++i) 
+        bool isAnySensorActive = false;
+        int Result = -1;
+
+        for (int i = 0; i < sensors.Length; i++)
         {
-            if (sensors[i] == true)
+            if (sensors[i])
             {
+                isAnySensorActive = true;
                 currentLastSensingIndex = i;
             }
         }
 
-        if (previousLastSensingIndex == currentLastSensingIndex)
-        {
-            Debug.Log("Data Not Changed");
+        Result = previousLastSensingIndex - currentLastSensingIndex;
+
+        Debug.Log(Result);
+
+        if (isGameEnd)
             return;
-        }
 
-        if (currentLastSensingIndex - currentStartSensingIndex > 8)
+        if (currnetGameState == GameState.Title && isAnySensorActive)
         {
-            Debug.Log("Insert at last two shape");
-            return;
+            UnloadInsertNewShapeUI();
+            LoadInGameUI();
         }
-
-        int Result = currentLastSensingIndex - previousLastSensingIndex;
-        shape.UpdateRotateAndLocation(Result);
-    }
-
-    void TestFunction() 
-    {
-        currentLastSensingIndex = 1;
-
-        if (shapeType == ShapeType.None) 
+        else if (currnetGameState == GameState.InGame)
+        {
+            if (Result != 0)
+            {
+                shape.UpdateRotateAndLocation(Result);
+            }
+        }
+        else if (insertNewShapeUI.activeSelf && isAnySensorActive) 
         {
             LoadInGameUI();
         }
-
-        if (Input.GetKeyDown(KeyCode.D))
-        {
-            shape.UpdateRotateAndLocation(5);
-        }
-        else if (Input.GetKeyDown(KeyCode.A)) 
-        {
-            shape.UpdateRotateAndLocation(-5);
-        }
     }
 
-    void SettingShape() 
+    void SettingShape()
     {
         if (shapeType == ShapeType.Sphere)
         {
             if (currentLastSensingIndex == RectIndex)
                 shapeType = ShapeType.Rect;
-            else if(currentLastSensingIndex == HexagonIndex)
+            else if (currentLastSensingIndex == HexagonIndex)
                 shapeType = ShapeType.Hexagon;
             else
+            {
                 shapeType = ShapeType.None;
+                LoadWrongShapeUI();
+            }
         }
-        else if (shapeType == ShapeType.None) 
+        else if (shapeType == ShapeType.None)
         {
             shapeType = ShapeType.Sphere;
+        }
+    }
+
+    void InitializeSerialPort()
+    {
+        try
+        {
+            serialPort = new SerialPort(portName, baudRate)
+            {
+                DataBits = 8,
+                Parity = Parity.None,
+                StopBits = StopBits.One,
+                ReadTimeout = 500,
+                WriteTimeout = 500
+            };
+
+            serialPort.Open();
+            Debug.Log("Serial port opened successfully.");
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to open serial port: {e.Message}");
+        }
+    }
+
+    async Task StartListening()
+    {
+        while (serialPort != null && serialPort.IsOpen)
+        {
+            try
+            {
+                if (serialPort.BytesToRead >= receivedBytes.Length)
+                {
+                    // 비동기로 데이터 읽기
+                    await Task.Run(() => serialPort.Read(receivedBytes, 0, receivedBytes.Length));
+                    SaveData(receivedBytes); // 데이터 저장
+                }
+                else
+                {
+                    await Task.Delay(50); // 데이터를 기다리는 동안 CPU 사용량 최소화
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error reading from serial port: {e.Message}");
+                break; // 오류 발생 시 루프 종료
+            }
+        }
+    }
+
+    void SaveData(byte[] data)
+    {
+        if (data == null || data.Length < 9)
+        {
+            Debug.LogError("수신된 데이터 오류(데이터가 짧습니다.)");
+            return;
+        }
+
+        Array.Copy(data, latestData, data.Length);
+
+        if (latestData[0] == 0xFA)
+        {
+            int bitIndex = 0;
+
+            for (int i = 1; i < 9; i++)
+            {
+                if (i == 1 || i == 4 || i == 7)
+                {
+                    for (int j = 7; j >= 0; j--)
+                    {
+                        bool bit = (latestData[i] & (1 << j)) != 0;
+
+                        if (bitIndex < sensors.Length)
+                        {
+                            sensors[bitIndex] = bit;
+
+                            if (bit && bitIndex < currentStartSensingIndex)
+                            {
+                                currentStartSensingIndex = bitIndex;
+                            }
+                        }
+
+                        bitIndex++;
+                    }
+                }
+            }
+
+            CheckArray();
         }
     }
 }

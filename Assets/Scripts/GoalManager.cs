@@ -26,7 +26,7 @@ public class GoalManager : MonoBehaviour
                 if (ShapeXPosition > GoalXPosition)
                 {
                     EnterToGoal = false;
-                    UIManager.Instance.isGameEnd = true;
+                    UIManager.Instance.LoadGameEndUI();
 
                     if (timermanager != null) 
                     {

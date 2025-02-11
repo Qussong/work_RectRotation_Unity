@@ -21,10 +21,9 @@ public class TimerManager : MonoBehaviour
 
             if (timerimage.fillAmount <= 0) 
             {
-                timerimage.fillAmount = 0;
-                UIManager.Instance.isGameEnd = true;
+                timerimage.fillAmount = 0;                
                 UIManager.Instance.IsTimeOut = true;
-                UIManager.Instance.TestStartButton = false;
+                UIManager.Instance.LoadGameEndUI();
                 start = false;
             }
         }
