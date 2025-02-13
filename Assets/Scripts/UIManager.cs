@@ -130,6 +130,7 @@ public class UIManager : MonoBehaviour
 
     public void LoadTitleUI()
     {
+
         currnetGameState = GameState.Title;
         isGameEnd = false;
         shapeType = ShapeType.None;
@@ -180,6 +181,7 @@ public class UIManager : MonoBehaviour
         if (shapeType == ShapeType.Max)
             return;
 
+        SendData(true);
         UnloadInsertNewShapeUI();
         currnetGameState = GameState.InGame;
         SettingShape();
@@ -197,6 +199,7 @@ public class UIManager : MonoBehaviour
 
     void UnloadPleaseTakeOutShapeUI()
     {
+        SendData(false);
         pleaseTakeOutShapeUI.SetActive(false);
     }
 
@@ -302,12 +305,18 @@ public class UIManager : MonoBehaviour
     {
         if (shapeType == ShapeType.Sphere)
         {
-            if (currentLastSensingIndex <= RectIndex)
+            shapeType = ShapeType.Rect;
+
+            //육각형이 추가되는 경우
+            //센싱된 첫 인덱스에 따라 사각형 또는 육각형으로 정하는 코드
+            //문제는 현재 센싱되는 인덱스가 서로 너무 유사하고 꽂는 위치에 따라 인덱스가 달라지므로 정확히 판별할수가 없음
+            
+/*            if (currentLastSensingIndex <= RectIndex)
                 shapeType = ShapeType.Rect;
             else
             {
                 shapeType = ShapeType.Hexagon;
-            }
+            }*/
         }
         else if (shapeType == ShapeType.None)
         {
@@ -321,11 +330,11 @@ public class UIManager : MonoBehaviour
         {
             serialPort = new SerialPort(portName, baudRate)
             {
-                DataBits = 8,
-                Parity = Parity.None,
-                StopBits = StopBits.One,
-                ReadTimeout = 500,
-                WriteTimeout = 500
+                DataBits = 8, //한번에 전송하는 비트 수(Default : 8)
+                Parity = Parity.None, //패리티 검출 방식을 사용하지 않음
+                StopBits = StopBits.One, //정지비트(비트의 끝을 알림), 정지비트는 1비트 사용
+                ReadTimeout = 500, //읽기시간, 500ms 동안 응답이 없다면 예외발생
+                WriteTimeout = 500 //쓰기시간, 500ms 동안 응답이 없다면 예외발생
             };
 
             serialPort.Open();
@@ -347,7 +356,6 @@ public class UIManager : MonoBehaviour
                 {
                     // 비동기로 데이터 읽기
                     await Task.Run(() => serialPort.Read(receivedBytes, 0, receivedBytes.Length));
-                    SendData(receivedBytes); // 받은 데이터 전송
                     SaveData(receivedBytes); // 데이터 저장
                 }
                 else
@@ -410,10 +418,19 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    void SendData(byte[] Data) 
+    void SendData(bool IsStart) 
     {
+        byte[] Data = new byte[2];
+
         if (serialPort != null && serialPort.IsOpen)
         {
+            Data[0] = 0xFA;
+
+            if (IsStart)
+                Data[1] = 0x41;
+            else
+                Data[1] = 0X42;
+
             try
             {
                 serialPort.Write(Data, 0, Data.Length);

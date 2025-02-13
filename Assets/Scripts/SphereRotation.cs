@@ -6,11 +6,16 @@ using UnityEngine.UIElements;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
-    [SerializeField] float MoveSpeed = 10;
-    [SerializeField] float RotationSpeed = 10;
+    [SerializeField] float MoveSpeed;
+    [SerializeField] float RotationSpeed;
 
     Vector3 MovePosition = new Vector3(0, 0, 0);
-    
+    Vector3 targetPosition = new Vector3(0, 0, 0);
+    private void Start()
+    {
+        MovePosition.y = transform.position.y;
+        MovePosition.z = transform.position.z;
+    }
     public void MoveAndRotate(int sensorDist) 
     {
         Debug.Log(sensorDist);
@@ -19,16 +24,15 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         float ratio = 33 / 2 * Mathf.PI * radius;
         float rotationAngle = 360 * ratio;
         int amount = Mathf.Abs(sensorDist);
-        Vector3 targetPosition = new Vector3(0, 0, 0);
 
         if (sensorDist < 0)
         {
-            targetPosition.x = 60 * amount;
+            targetPosition.x = 60f * amount;
             rotationAngle *= -1;
         }
         else
         {
-            targetPosition.x = -60 * amount;
+            targetPosition.x = -60f * amount;
             //transform.Translate(targetPosition, Space.World);
             //transform.Rotate(0, 0, rotationAngle);
         }
@@ -59,7 +63,7 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         while (Mathf.Abs(targetRotation - transform.eulerAngles.z) > 1.0f)
         {
             float step = RotationSpeed * Time.deltaTime;
-            float currentRotation = Mathf.MoveTowardsAngle(transform.eulerAngles.z, targetRotation, step);
+            float currentRotation = Mathf.Lerp(transform.eulerAngles.z, targetRotation, step);
             transform.rotation = Quaternion.Euler(0, 0, currentRotation);
 
             yield return null;
@@ -70,10 +74,15 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 
     IEnumerator Move(Vector3 targetLocation)
     {
-        while (Vector3.Distance(transform.position, targetLocation) > 1.0f)
+        targetLocation.x += transform.position.x;
+        MovePosition.y = transform.position.y;
+
+        Debug.Log(Mathf.Abs(transform.position.x - targetLocation.x));
+
+        while (Mathf.Abs(transform.position.x - targetLocation.x) > 1.0f)
         {
             MovePosition.x = Mathf.Lerp(transform.position.x, targetLocation.x, Time.deltaTime * MoveSpeed);
-            transform.Translate(MovePosition, Space.World);
+            transform.position = MovePosition;
 
             yield return null;
         }
