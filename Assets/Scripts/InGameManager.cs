@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -51,12 +50,17 @@ public class InGameManager : MonoBehaviour
                 goalimage.sprite = goalSprites[2];
                 InstantiateGameObject = Instantiate(shapes[2], StartPos, Quaternion.identity, transform);
                 break;
+            case UIManager.ShapeType.Max:
+                return;
         }
+
 
         UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
         goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();
         AddLineRendererIn.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().InLineRenderUI;
         AddLineRendererOut.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().OutLineRenderUI;
+        AddLineRendererIn.ResetPoints();
+        AddLineRendererOut.ResetPoints();
 
         timermanager.StartTimer();
     }

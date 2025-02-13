@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
+    [SerializeField] float MoveSpeed;
+    [SerializeField] float RotationSpeed;
     
     public void MoveAndRotate(int sensorDist) 
     {
@@ -18,13 +20,13 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 
         if (sensorDist < 0)
         {
-            targetPosition.x = 50 * amount;
+            targetPosition.x = 70 * amount;
             transform.Translate(targetPosition, Space.World);
             transform.Rotate(0, 0, -rotationAngle);
         }
         else
         {
-            targetPosition.x = -50 * amount;
+            targetPosition.x = -70 * amount;
             transform.Translate(targetPosition, Space.World);
             transform.Rotate(0, 0, rotationAngle);
         }
@@ -33,5 +35,37 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
     public void InitPivotPoint()
     {
         // pivot, cycloid, touch point init (option for title scene)
+    }
+
+    IEnumerator Rotate(float TargetRotate)
+    {
+        float RotateAngle = 0.0f;
+
+        while (Mathf.Abs(TargetRotate - transform.rotation.z) > 1.0f)
+        {
+            RotateAngle = Mathf.LerpAngle(transform.rotation.z, TargetRotate, Time.deltaTime * RotationSpeed);
+            transform.Rotate(0, 0, RotateAngle);
+
+            yield return null;
+        }
+
+        transform.rotation = Quaternion.Euler(0, 0, TargetRotate);
+
+    }
+
+    IEnumerator Move(Vector3 targetLocation)
+    {
+        Vector3 MovePosition = new Vector3(0, 0, 0);
+
+        while (Vector3.Distance(targetLocation, transform.position) > 1.0f)
+        {
+            float XPosition = Mathf.Lerp(transform.position.x, targetLocation.x, Time.deltaTime * MoveSpeed);
+            MovePosition.x = XPosition;
+            transform.Translate(MovePosition, Space.World);
+
+            yield return null;
+        }
+
+        transform.position = targetLocation;
     }
 }
