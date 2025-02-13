@@ -134,7 +134,6 @@ MonoBehaviour:
   prevRotation: 0
   rotationAnglePerSecond: 0
   rotationDirection: 1
-  StartPoint: {x: 0, y: 0, z: 0}
   curRotation: 0
   cycloidPos: 0
   pivotPos: 5

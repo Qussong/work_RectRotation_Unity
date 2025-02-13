@@ -108,6 +108,7 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         Debug.Log("A Cur : " + curRotation + ", Prev : " + prevRotation + ", Total : " + totalRotation);
 
         // 코너 배열의 순서를 LB, LM, LT, RT, RM, RB 로 설정
+        // 해당 오브젝트들은 Shape Prefab에서 이미 가지고 있음
         corners[0] = leftBottomCorner;  // LB (240°)
         corners[1] = leftMiddleCorner;  // LM (180°)
         corners[2] = leftTopCorner;     // LT (120°)
@@ -142,7 +143,6 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
         int nextValue = (curValue + 1) % 6;
         return nextValue;
     }
-
     public void MoveAndRotate(int sensorDist)
     {
         // 센서 값에 따라 회전 방향 설정
@@ -161,74 +161,80 @@ public class HexagonRotation : MonoBehaviour, MoveAndRotateInterface
             if (rotationDirection == true)
             {
                 // 오른쪽 회전일 경우: 터치 포인트 = pivot에서 한 칸 왼쪽 (모듈로 연산)
-                touchPos = ModuloOperatorRight(pivotPos);
+                touchPos = ModuloOperatorLeft(pivotPos);
             }
             else
             {
                 // 왼쪽 회전일 경우: 터치 포인트 = pivot에서 한 칸 오른쪽
-                touchPos = ModuloOperatorLeft(pivotPos);
+                touchPos = ModuloOperatorRight(pivotPos);
             }
+
             touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
         }
 
         // 회전 처리
-        if (rotationDirection)
-        {
-            if (shape != null && shape.AutoMove == true)
-            {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist * 50);
-            }
-            else
-            {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist * 50);
-            }
+         if (rotationDirection)
+         {
+             if (shape != null && shape.AutoMove == true)
+             {
+                 ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * 50);  
+             }
+             else
+             {
+                 ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond)  * 50);
+             }
 
-            // 터치 포인트가 피벗 포인트의 수평 위치보다 아래로 내려가면 회전 보정 및 피벗/터치 위치 갱신
-            if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
-            {
-                curRotation = ownerImage.rectTransform.rotation.eulerAngles.z;
-                transform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
+             // 터치 포인트가 피벗 포인트의 수평 위치보다 아래로 내려가면 회전 보정 및 피벗/터치 위치 갱신
 
-                pivotPos = ModuloOperatorRight(pivotPos);
-                touchPos = ModuloOperatorRight(touchPos);
+             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
+             {
+                 curRotation = ownerImage.rectTransform.rotation.eulerAngles.z;
+                 transform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
 
-                pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
-                touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
+                 pivotPos = ModuloOperatorLeft(pivotPos);
+                 touchPos = ModuloOperatorLeft(touchPos);
 
-                Vector3 ResetPosition = ownerImage.transform.localPosition;
-                ResetPosition.y = 0;
-                ResetPosition.z = 0;
-                ownerImage.transform.localPosition = ResetPosition;
-            }
-        }
-        else
-        {
-            if (shape != null && shape.AutoMove == true)
-            {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist * 50);
-            }
-            else
-            {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * sensorDist * 50);
-            }
+                 pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
+                 touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
 
-            if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
-            {
-                pivotPos = ModuloOperatorLeft(pivotPos);
-                touchPos = ModuloOperatorLeft(touchPos);
-                pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
-                touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
-                Vector3 ResetPosition = ownerImage.transform.localPosition;
-                ResetPosition.y = 0;
-                ResetPosition.z = 0;
-                ownerImage.transform.localPosition = ResetPosition;
-            }
-        }
+                 Vector3 ResetPosition = ownerImage.transform.localPosition;
+                 ResetPosition.y = 0;
+                 ResetPosition.z = 0;
 
-        curRotation = ownerImage.rectTransform.rotation.eulerAngles.z;
-        prevRotationDirection = rotationDirection;
+                 ownerImage.transform.localPosition = ResetPosition;
+             }
+         }
+         else
+         {
+             if (shape != null && shape.AutoMove == true)
+             {
+                 ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * 50);
+             }
+             else
+             {
+                 ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * 50);
+             }
+
+             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
+             {
+                 pivotPos = ModuloOperatorRight(pivotPos);
+                 touchPos = ModuloOperatorRight(touchPos);
+
+                 pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
+                 touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
+
+                 Vector3 ResetPosition = ownerImage.transform.localPosition;
+                 ResetPosition.y = 0;
+                 ResetPosition.z = 0;
+                 ownerImage.transform.localPosition = ResetPosition;
+             }
+         }
+
+         curRotation = ownerImage.rectTransform.rotation.eulerAngles.z;
+         prevRotationDirection = rotationDirection;
+        
     }
-
+    
     public void InitPivotPoint()
     {
         // 필요시 pivot, cycloid, touch 포인트의 초기 위치를 설정합니다.
