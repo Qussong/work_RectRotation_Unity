@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Security.Policy;
-using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -19,19 +17,18 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         float rotationAngle = 360 * ratio;
         int amount = Mathf.Abs(sensorDist);
         Vector3 targetPosition = new Vector3(0, 0, 0);
-        
 
         if (sensorDist < 0)
         {
-            targetPosition.x = -50 * amount;
-            StartCoroutine(Move(targetPosition));
-            StartCoroutine(Rotate(-rotationAngle));
+            targetPosition.x = 70 * amount;
+            transform.Translate(targetPosition, Space.World);
+            transform.Rotate(0, 0, -rotationAngle);
         }
         else
         {
-            targetPosition.x = 50 * amount;
-            StartCoroutine(Move(targetPosition));
-            StartCoroutine(Rotate(rotationAngle));
+            targetPosition.x = -70 * amount;
+            transform.Translate(targetPosition, Space.World);
+            transform.Rotate(0, 0, rotationAngle);
         }
     }
 
@@ -40,25 +37,23 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         // pivot, cycloid, touch point init (option for title scene)
     }
 
-    IEnumerator Rotate(float TargetRotate) 
+    IEnumerator Rotate(float TargetRotate)
     {
-        while (true)
+        float RotateAngle = 0.0f;
+
+        while (Mathf.Abs(TargetRotate - transform.rotation.z) > 1.0f)
         {
-            float RotateAngle = 0.0f;
+            RotateAngle = Mathf.LerpAngle(transform.rotation.z, TargetRotate, Time.deltaTime * RotationSpeed);
+            transform.Rotate(0, 0, RotateAngle);
 
-            while (Mathf.Abs(TargetRotate - transform.rotation.z) > 1.0f)
-            {
-                RotateAngle = Mathf.LerpAngle(transform.rotation.z, TargetRotate, Time.deltaTime * RotationSpeed);
-                transform.Rotate(0, 0, RotateAngle);
-
-                yield return null;
-            }
-
-            transform.rotation = Quaternion.Euler(0, 0, TargetRotate);
+            yield return null;
         }
+
+        transform.rotation = Quaternion.Euler(0, 0, TargetRotate);
+
     }
 
-    IEnumerator Move(Vector3 targetLocation) 
+    IEnumerator Move(Vector3 targetLocation)
     {
         Vector3 MovePosition = new Vector3(0, 0, 0);
 

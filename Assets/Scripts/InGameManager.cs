@@ -57,10 +57,10 @@ public class InGameManager : MonoBehaviour
 
         UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
         goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();
-        AddLineRendererIn.ResetPoints();
-        AddLineRendererOut.ResetPoints();
         AddLineRendererIn.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().InLineRenderUI;
         AddLineRendererOut.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().OutLineRenderUI;
+        AddLineRendererIn.ResetPoints();
+        AddLineRendererOut.ResetPoints();
 
         timermanager.StartTimer();
     }

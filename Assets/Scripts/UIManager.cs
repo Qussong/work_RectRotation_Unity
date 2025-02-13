@@ -121,7 +121,9 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        CheckArray();
+        //센서값이 넘어오면 알아서 호출되는 함수
+        //에디터에서 테스트용으로 Update에서 초기.
+        //CheckArray();
         
     }
 
@@ -255,6 +257,7 @@ public class UIManager : MonoBehaviour
 
     void CheckArray()
     {
+
         previousStartSensingIndex = currentStartSensingIndex;
         previousLastSensingIndex = currentLastSensingIndex;
 
@@ -282,6 +285,7 @@ public class UIManager : MonoBehaviour
         }
         else if (currnetGameState == GameState.InGame)
         {
+
             if (Result != 0)
             {
                 shape.UpdateRotateAndLocation(Result);
@@ -291,20 +295,18 @@ public class UIManager : MonoBehaviour
         {
             LoadInGameUI();
         }
+
     }
 
     void SettingShape()
     {
         if (shapeType == ShapeType.Sphere)
         {
-            if (currentLastSensingIndex == RectIndex)
+            if (currentLastSensingIndex <= RectIndex)
                 shapeType = ShapeType.Rect;
-            else if (currentLastSensingIndex >= HexagonIndex)
-                shapeType = ShapeType.Hexagon;
             else
             {
-                shapeType = ShapeType.Max;
-                LoadWrongShapeUI();
+                shapeType = ShapeType.Hexagon;
             }
         }
         else if (shapeType == ShapeType.None)

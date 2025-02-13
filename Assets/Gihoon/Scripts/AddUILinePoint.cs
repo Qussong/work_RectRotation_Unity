@@ -11,7 +11,7 @@ public class AddUILinePoint : MonoBehaviour
     [Header("Essential Settings")]
     [SerializeField] GameObject anchor = null;
 
-    UILineRenderer uiLineRenderer = null;
+    [SerializeField] UILineRenderer uiLineRenderer = null;
     public RectTransform targetRectTransform = null;
     RectTransform BrushRectTransform = null;
     List<Vector2> points = new List<Vector2>();
@@ -23,8 +23,8 @@ public class AddUILinePoint : MonoBehaviour
             Debug.Log("Anchor is not setting!!");
             return;
         }
-
-        uiLineRenderer = anchor.GetComponent<UILineRenderer>();
+        
+        //uiLineRenderer = anchor.GetComponent<UILineRenderer>();
 
         if (null != uiLineRenderer)
         {
@@ -68,6 +68,14 @@ public class AddUILinePoint : MonoBehaviour
         Debug.Log("Reset");
         transform.position = anchor.transform.position;
         points.Clear();
+        points = new List<Vector2>();
+
+        // temp
+        if(null == uiLineRenderer)
+        {
+            return;
+        }
+
         uiLineRenderer.Points = points.ToArray();
     }
 }
