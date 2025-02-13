@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
@@ -42,6 +43,9 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     Image[] corners = new Image[4];
 
+    // Enhanced Rotation Logic
+    [SerializeField][ReadOnly] private float baseAngle = 360.0f;
+
     void Start()
     {
         if (null == leftTopCorner ||
@@ -57,15 +61,6 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         corners[2] = rightTopCorner;    // Corner.RT
         corners[3] = rightBottomCorner; // Corner.RB
 
-        /*
-        cycloidPos = (int)CornerName.LB;
-        pivotPos = (int)CornerName.RB;
-        touchPos = (int)CornerName.RT;
-
-        cycloidPoint.rectTransform.localPosition = corners[cycloidPos].rectTransform.localPosition;
-        pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
-        touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
-        */
         InitPivotPoint();
 
         sideLength = ownerImage.rectTransform.rect.width;
@@ -78,7 +73,9 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     void Update()
     {
-
+        // Input Test Code
+        /*float input = Input.GetAxisRaw("Horizontal");
+        MoveAndRotate((int)input);*/
     }
 
     float InterpolationAngle(float angle)
@@ -105,7 +102,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
     public void MoveAndRotate(int sensorDist)
     {
-
+        // Set Direction
         if (sensorDist < 0)
         {
             rotationDirection = false;
@@ -115,7 +112,24 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             rotationDirection = true;
         }
 
-        //rotationAnglePerSecond = sensorDist;
+        // Set Base Angle
+        if(rotationDirection)
+        {
+            // right
+            if(baseAngle == 0.0f)
+            {
+                baseAngle = 360.0f;
+            }
+        }
+        else
+        {
+            // left
+            if(baseAngle == 360.0f)
+            {
+                baseAngle = 0.0f;
+            }
+        }
+
 
         // When rotation direction change
         if (prevRotationDirection != rotationDirection)
@@ -132,10 +146,8 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
                 // Touch Point Position = pivot + 1
                 touchPos = ModuloOperatorLeft(pivotPos);
             }
-
             touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
         }
-
 
         // Rotation Direction : right
         if (rotationDirection)
@@ -146,24 +158,40 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             }
             else
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond)/* * Time.deltaTime*/ * sensorDist);
+                if (Mathf.Clamp(Mathf.Abs(baseAngle - ownerImage.rectTransform.eulerAngles.z), 0.0f, 90.0f) == 90.0f)
+                {
+                    if(ownerImage.rectTransform.eulerAngles.z == 0.0f && baseAngle == 360.0f)
+                    {
+                        ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                    }
+                    else
+                    {
+                        Vector3 curRotation = ownerImage.rectTransform.eulerAngles;
+                        ownerImage.rectTransform.eulerAngles.Set(curRotation.x, curRotation.y, baseAngle - 90.0f);
+                    }
+                }
+                else
+                {
+                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                }
             }
 
             // When the TouchPoint touch ground
-            if (touchPoint.transform.position.y < pivotPoint.transform.position.y)
+            if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
             {
-                //rectImage.rectTransform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
                 curRotation = ownerImage.rectTransform.rotation.eulerAngles.z;
                 transform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
 
                 pivotPos = ModuloOperatorRight(pivotPos);
                 touchPos = ModuloOperatorRight(touchPos);
 
+                // Set new base angle 
+                baseAngle = ownerImage.rectTransform.eulerAngles.z;
+
                 pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
                 touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
 
                 Vector3 ResetPosition = ownerImage.transform.localPosition;
-                //ResetPosition.y = 0;
                 ResetPosition.y = StartPoint.y;
                 ResetPosition.z = 0;
                 ownerImage.transform.localPosition = ResetPosition;
@@ -174,26 +202,39 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         {
             if(shape != null && shape.AutoMove == true)
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
             }
             else
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.forward, Mathf.Abs(rotationAnglePerSecond) /** Time.deltaTime*/ * sensorDist);
+                if (Mathf.Clamp(Mathf.Abs(baseAngle - ownerImage.rectTransform.eulerAngles.z), 0.0f, 90.0f) == 90.0f)
+                {
+                    Vector3 curRotation = ownerImage.rectTransform.eulerAngles;
+                    ownerImage.rectTransform.eulerAngles.Set(curRotation.x, curRotation.y, baseAngle + 90.0f);
+                    Debug.Log("Rotate Clamp Left");
+                    Debug.Log("Real Cur Rotation : " + ownerImage.rectTransform.eulerAngles.z + ", Base Rotation : " + baseAngle);
+                }
+                else
+                {
+                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) /** Time.deltaTime*/ * sensorDist);
+                    Debug.Log("Rotate Left");
+                    Debug.Log("Real Cur Rotation : " + ownerImage.rectTransform.eulerAngles.z + ", Base Rotation : " + baseAngle);
+                }
             }
 
 
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)
             {
-                //rectImage.rectTransform.rotation = Quaternion.Euler(0, 0, InterpolationAngle(curRotation));
-
                 pivotPos = ModuloOperatorLeft(pivotPos);
                 touchPos = ModuloOperatorLeft(touchPos);
+
+                // Set new base angle
+                baseAngle = ownerImage.rectTransform.eulerAngles.z;
+
                 pivotPoint.rectTransform.localPosition = corners[pivotPos].rectTransform.localPosition;
                 touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
 
                 Vector3 ResetPosition = ownerImage.transform.localPosition;
-                //ResetPosition.y = 0;
                 ResetPosition.y = StartPoint.y;
                 ResetPosition.z = 0;
                 ownerImage.transform.localPosition = ResetPosition;
