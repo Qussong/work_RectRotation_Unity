@@ -123,7 +123,7 @@ public class UIManager : MonoBehaviour
     {
         //센서값이 넘어오면 알아서 호출되는 함수
         //에디터에서 테스트용으로 Update에서 초기.
-        //CheckArray();
+        CheckArray();
         
     }
 
@@ -347,6 +347,7 @@ public class UIManager : MonoBehaviour
                 {
                     // 비동기로 데이터 읽기
                     await Task.Run(() => serialPort.Read(receivedBytes, 0, receivedBytes.Length));
+                    SendData(receivedBytes); // 받은 데이터 전송
                     SaveData(receivedBytes); // 데이터 저장
                 }
                 else
@@ -406,6 +407,26 @@ public class UIManager : MonoBehaviour
             }
 
             CheckArray();
+        }
+    }
+
+    void SendData(byte[] Data) 
+    {
+        if (serialPort != null && serialPort.IsOpen)
+        {
+            try
+            {
+                serialPort.Write(Data, 0, Data.Length);
+                Debug.Log($"Sent {Data.Length} bytes: {BitConverter.ToString(Data)}");
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Failed to send data: {e.Message}");
+            }
+        }
+        else
+        {
+            Debug.LogWarning("Serial port is not open or not connected.");
         }
     }
 }
