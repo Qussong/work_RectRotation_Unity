@@ -11,7 +11,6 @@ public class AddUILinePoint : MonoBehaviour
     [Header("Essential Settings")]
     [SerializeField] GameObject anchor = null;
 
-
     UILineRenderer uiLineRenderer = null;
     public RectTransform targetRectTransform = null;
     RectTransform BrushRectTransform = null;
@@ -44,11 +43,11 @@ public class AddUILinePoint : MonoBehaviour
 
     void Update()
     {
-        if (UIManager.Instance.isGameEnd) 
-        {
-            transform.position = anchor.transform.position;
-            points.Clear();
-        }
+        if (UIManager.Instance.isGameEnd)
+            return;
+
+        if (UIManager.Instance.IsTimeOut)
+            return;
 
         if (UIManager.Instance.shapeType == UIManager.ShapeType.Max || UIManager.Instance.shapeType == UIManager.ShapeType.None)
             return;
@@ -61,6 +60,14 @@ public class AddUILinePoint : MonoBehaviour
     public void AddPoint(Vector2 newPoint)
     {
         points.Add(newPoint);
+        uiLineRenderer.Points = points.ToArray();
+    }
+
+    public void ResetPoints() 
+    {
+        Debug.Log("Reset");
+        transform.position = anchor.transform.position;
+        points.Clear();
         uiLineRenderer.Points = points.ToArray();
     }
 }

@@ -121,8 +121,10 @@ public class UIManager : MonoBehaviour
 
     private void Update()
     {
-        CheckArray();      
+        CheckArray();
+        
     }
+
 
     public void LoadTitleUI()
     {
@@ -134,7 +136,6 @@ public class UIManager : MonoBehaviour
         inGame.SetActive(false);
         IsTimeOut = false;
         StopAllCoroutines();
-
     }
 
     public void LoadGameEndUI()
@@ -373,27 +374,33 @@ public class UIManager : MonoBehaviour
         {
             int bitIndex = 0;
 
-            for (int i = 1; i < 9; i++)
+            for (int i = 9; i > 0; i--)
             {
-                if (i == 1 || i == 4 || i == 7)
+                for (int j = 0; j < 7; j++)
                 {
-                    for (int j = 7; j >= 0; j--)
+                    if (i == 1) 
                     {
-                        bool bit = (latestData[i] & (1 << j)) != 0;
-
-                        if (bitIndex < sensors.Length)
-                        {
-                            sensors[bitIndex] = bit;
-
-                            if (bit && bitIndex < currentStartSensingIndex)
-                            {
-                                currentStartSensingIndex = bitIndex;
-                            }
-                        }
-
-                        bitIndex++;
+                        if (j > 4)
+                            continue;
                     }
+
+                    bool bBit = (latestData[i] & (1 << j)) != 0;
+
+                    if (bitIndex < sensors.Length)
+                    {
+                        sensors[bitIndex] = bBit;
+
+                        //처음 센싱된 인덱스를 확인하는 코드
+                        //필요하면 사용
+/*                        if (bBit && bitIndex < currentStartSensingIndex)
+                        {
+                            currentStartSensingIndex = bitIndex;
+                        }*/
+                    }
+
+                    bitIndex++;
                 }
+                
             }
 
             CheckArray();

@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
-using UnityEditor.EditorTools;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
@@ -58,6 +57,8 @@ public class InGameManager : MonoBehaviour
 
         UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
         goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();
+        AddLineRendererIn.ResetPoints();
+        AddLineRendererOut.ResetPoints();
         AddLineRendererIn.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().InLineRenderUI;
         AddLineRendererOut.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().OutLineRenderUI;
 
