@@ -99,7 +99,6 @@ MonoBehaviour:
   EndPos: 0
   OutLineRenderUI: {fileID: 9005021284381045953}
   InLineRenderUI: {fileID: 6675178088172565338}
-  ShapeGameObject: {fileID: 0}
 --- !u!114 &9004999962044871888
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -112,6 +111,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4962c5ba01bdf94592318abade49403, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  MoveSpeed: 10
+  RotationSpeed: 10
 --- !u!1 &331756722654769409
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,11 +2,14 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
-    [SerializeField] float MoveSpeed;
-    [SerializeField] float RotationSpeed;
+    [SerializeField] float MoveSpeed = 10;
+    [SerializeField] float RotationSpeed = 10;
+
+    Vector3 MovePosition = new Vector3(0, 0, 0);
     
     public void MoveAndRotate(int sensorDist) 
     {
@@ -20,16 +23,20 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 
         if (sensorDist < 0)
         {
-            targetPosition.x = 70 * amount;
-            transform.Translate(targetPosition, Space.World);
-            transform.Rotate(0, 0, -rotationAngle);
+            targetPosition.x = 60 * amount;
+            rotationAngle *= -1;
         }
         else
         {
-            targetPosition.x = -70 * amount;
-            transform.Translate(targetPosition, Space.World);
-            transform.Rotate(0, 0, rotationAngle);
+            targetPosition.x = -60 * amount;
+            //transform.Translate(targetPosition, Space.World);
+            //transform.Rotate(0, 0, rotationAngle);
         }
+
+        transform.Translate(targetPosition, Space.World);
+        transform.Rotate(0, 0, rotationAngle);
+        //StartCoroutine(Move(targetPosition));
+        //StartCoroutine(Rotate(rotationAngle));
     }
 
     public void InitPivotPoint()
@@ -37,35 +44,41 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         // pivot, cycloid, touch point init (option for title scene)
     }
 
-    IEnumerator Rotate(float TargetRotate)
+/*    IEnumerator Rotate(float TargetRotate)
     {
-        float RotateAngle = 0.0f;
+        float startRotation = transform.eulerAngles.z;
+        float targetRotation = TargetRotate;
+        float rotationAngle = Mathf.Abs(targetRotation - startRotation);
 
-        while (Mathf.Abs(TargetRotate - transform.rotation.z) > 1.0f)
+        // 회전 방향에 따라 부호를 결정
+        if (rotationAngle > 180)
         {
-            RotateAngle = Mathf.LerpAngle(transform.rotation.z, TargetRotate, Time.deltaTime * RotationSpeed);
-            transform.Rotate(0, 0, RotateAngle);
+            targetRotation -= 360;
+        }
+
+        while (Mathf.Abs(targetRotation - transform.eulerAngles.z) > 1.0f)
+        {
+            float step = RotationSpeed * Time.deltaTime;
+            float currentRotation = Mathf.MoveTowardsAngle(transform.eulerAngles.z, targetRotation, step);
+            transform.rotation = Quaternion.Euler(0, 0, currentRotation);
 
             yield return null;
         }
 
-        transform.rotation = Quaternion.Euler(0, 0, TargetRotate);
-
+        transform.rotation = Quaternion.Euler(0, 0, targetRotation);
     }
 
     IEnumerator Move(Vector3 targetLocation)
     {
-        Vector3 MovePosition = new Vector3(0, 0, 0);
-
-        while (Vector3.Distance(targetLocation, transform.position) > 1.0f)
+        while (Vector3.Distance(transform.position, targetLocation) > 1.0f)
         {
-            float XPosition = Mathf.Lerp(transform.position.x, targetLocation.x, Time.deltaTime * MoveSpeed);
-            MovePosition.x = XPosition;
+            MovePosition.x = Mathf.Lerp(transform.position.x, targetLocation.x, Time.deltaTime * MoveSpeed);
             transform.Translate(MovePosition, Space.World);
 
             yield return null;
         }
 
         transform.position = targetLocation;
-    }
+    }*/
+
 }
