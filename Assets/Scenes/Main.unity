@@ -4853,6 +4853,7 @@ MonoBehaviour:
   cycloidPos: -1
   pivotPos: -1
   touchPos: -1
+  baseAngle: 360
 --- !u!222 &5888860954595760003
 CanvasRenderer:
   m_ObjectHideFlags: 0

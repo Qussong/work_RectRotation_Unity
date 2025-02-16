@@ -6,47 +6,33 @@ using UnityEngine.UIElements;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
-    [SerializeField] float MoveSpeed;
-    [SerializeField] float RotationSpeed;
+    [SerializeField] float MoveSpeed;      // 필요시 사용
+    [SerializeField] float RotationSpeed;  // 필요시 사용
 
-    Vector3 MovePosition = new Vector3(0, 0, 0);
-    Vector3 targetPosition = new Vector3(0, 0, 0);
-    private void Start()
+    public void MoveAndRotate(int sensorDist)
     {
-        MovePosition.y = transform.position.y;
-        MovePosition.z = transform.position.z;
+        float radiusPx = 216.5f; // 구(원)의 반지름
+        float distancePerStep = 60f; // 한 단계(sensorDist 1)에 이동할 거리
+
+        // 이동해야 할 총 거리
+        float distance = distancePerStep * sensorDist * -1;
+        transform.Translate(distance, 0, 0, Space.World);
+
+        float distancePx = distancePerStep * sensorDist;  // 실제 이동 픽셀
+                                                            // transform.Translate(distancePx, 0, 0, Space.Self/World) 
+                                                            // => UI에서는 결국 RectTransform의anchoredPosition이 바뀔 텐데,
+                                                            //    이 부분도 픽셀 좌표로 해석됨
+
+        float rotationAngleDeg = (distancePx / radiusPx) * Mathf.Rad2Deg;
+        transform.Rotate(0, 0, rotationAngleDeg);
     }
-    public void MoveAndRotate(int sensorDist) 
-    {
-        Debug.Log(sensorDist);
 
-        float radius = 0.5f;
-        float ratio = 33 / 2 * Mathf.PI * radius;
-        float rotationAngle = 360 * ratio;
-        int amount = Mathf.Abs(sensorDist);
-
-        if (sensorDist < 0)
-        {
-            targetPosition.x = 60f * amount;
-            rotationAngle *= -1;
-        }
-        else
-        {
-            targetPosition.x = -60f * amount;
-            //transform.Translate(targetPosition, Space.World);
-            //transform.Rotate(0, 0, rotationAngle);
-        }
-
-        transform.Translate(targetPosition, Space.World);
-        transform.Rotate(0, 0, rotationAngle);
-        //StartCoroutine(Move(targetPosition));
-        //StartCoroutine(Rotate(rotationAngle));
-    }
 
     public void InitPivotPoint()
     {
         // pivot, cycloid, touch point init (option for title scene)
     }
+}
 
 /*    IEnumerator Rotate(float TargetRotate)
     {
@@ -90,4 +76,3 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
         transform.position = targetLocation;
     }*/
 
-}
