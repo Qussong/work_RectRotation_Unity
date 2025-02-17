@@ -63,7 +63,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         InitPivotPoint();
 
         sideLength = ownerImage.rectTransform.rect.width;
-        rotationAnglePerSecond = (33 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
+        rotationAnglePerSecond = (16 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
 
         shape = GetComponent<Shape>();
 
