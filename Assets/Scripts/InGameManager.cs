@@ -54,7 +54,7 @@ public class InGameManager : MonoBehaviour
                 return;
         }
 
-
+        InstantiateGameObject.transform.SetSiblingIndex(3);
         UIManager.Instance.shape = InstantiateGameObject.GetComponent<Shape>();
         goalManager.Shape = InstantiateGameObject.GetComponent<Shape>();
         AddLineRendererIn.targetRectTransform = InstantiateGameObject.GetComponent<Shape>().InLineRenderUI;

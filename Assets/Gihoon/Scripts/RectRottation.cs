@@ -63,7 +63,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         InitPivotPoint();
 
         sideLength = ownerImage.rectTransform.rect.width;
-        rotationAnglePerSecond = (33 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
+        rotationAnglePerSecond = (16 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
 
         shape = GetComponent<Shape>();
 
@@ -166,7 +166,8 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
                     else
                     {
                         Vector3 curRotation = ownerImage.rectTransform.eulerAngles;
-                        ownerImage.rectTransform.eulerAngles.Set(curRotation.x, curRotation.y, baseAngle - 90.0f);
+                        curRotation.z = baseAngle - 90.0f;
+                        ownerImage.rectTransform.eulerAngles = curRotation;
                     }
                 }
                 else
@@ -208,7 +209,8 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
                 if (Mathf.Clamp(Mathf.Abs(baseAngle - ownerImage.rectTransform.eulerAngles.z), 0.0f, 90.0f) == 90.0f)
                 {
                     Vector3 curRotation = ownerImage.rectTransform.eulerAngles;
-                    ownerImage.rectTransform.eulerAngles.Set(curRotation.x, curRotation.y, baseAngle + 90.0f);
+                    curRotation.z = baseAngle + 90.0f;
+                    ownerImage.rectTransform.eulerAngles = curRotation;
                     Debug.Log("Rotate Clamp Left");
                     Debug.Log("Real Cur Rotation : " + ownerImage.rectTransform.eulerAngles.z + ", Base Rotation : " + baseAngle);
                 }

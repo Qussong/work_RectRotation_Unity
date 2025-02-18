@@ -17,7 +17,7 @@ public class TimerManager : MonoBehaviour
     {
         if (start && !UIManager.Instance.isGameEnd) 
         {
-            timerimage.fillAmount -= Time.deltaTime * 0.05f;
+            timerimage.fillAmount -= Time.deltaTime * 0.02f;
 
             if (timerimage.fillAmount <= 0) 
             {
