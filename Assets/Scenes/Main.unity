@@ -4846,7 +4846,7 @@ MonoBehaviour:
   cycloidPoint: {fileID: 1389088899443622805}
   pivotPoint: {fileID: 980846984838610625}
   touchPoint: {fileID: 4890279559417281659}
-  rotationAnglePerSecond: 110
+  rotationAnglePerSecond: 6
   rotationDirection: 1
   StartPoint: {x: 0, y: 0, z: 0}
   curRotation: 0

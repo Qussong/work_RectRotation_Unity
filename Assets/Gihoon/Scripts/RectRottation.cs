@@ -45,6 +45,9 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
     // Enhanced Rotation Logic
     [SerializeField][ReadOnly] private float baseAngle = 360.0f;
 
+    int amount; // 입력된 센서의 양
+
+
     void Start()
     {
         if (null == leftTopCorner ||
@@ -62,19 +65,26 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
 
         InitPivotPoint();
 
-        sideLength = ownerImage.rectTransform.rect.width;
-        rotationAnglePerSecond = (16 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
-
         shape = GetComponent<Shape>();
+
+        sideLength = ownerImage.rectTransform.rect.width;
+        if(false == shape.AutoMove)
+        {
+            //rotationAnglePerSecond = (16 / (4 * sideLength)) * 360; // rotation angle per one sensor = (unit move dis / (4 * side length)) * 360 degree
+            rotationAnglePerSecond = (100 / (4 * sideLength)) * 360;
+        }
+
 
         StartPoint = ownerImage.rectTransform.localPosition;
     }
 
     void Update()
     {
+        /*
         // Input Test Code
-        /*float input = Input.GetAxisRaw("Horizontal");
-        MoveAndRotate((int)input);*/
+        float input = Input.GetAxisRaw("Horizontal");
+        MoveAndRotate((int)input);
+        */
     }
 
     float InterpolationAngle(float angle)
@@ -99,8 +109,24 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         return nextValue;
     }
 
+    IEnumerator CoroutineMoveRotate()
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            RectangleRotate();
+            yield return null;
+        }
+    }
+
     public void MoveAndRotate(int sensorDist)
     {
+        amount = Mathf.Abs(sensorDist);
+
+        if (false == shape.AutoMove)
+        {
+            sensorDist *= -1;
+        }
+
         // Set Direction
         if (sensorDist < 0)
         {
@@ -148,20 +174,28 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
             touchPoint.rectTransform.localPosition = corners[touchPos].rectTransform.localPosition;
         }
 
+        StartCoroutine(CoroutineMoveRotate());
+
+    }
+
+    void RectangleRotate()
+    {
         // Rotation Direction : right
         if (rotationDirection)
         {
+            Debug.Log("Right Rotation");
+
             if (shape != null && shape.AutoMove == true)
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime);
             }
             else
             {
                 if (Mathf.Clamp(Mathf.Abs(baseAngle - ownerImage.rectTransform.eulerAngles.z), 0.0f, 90.0f) == 90.0f)
                 {
-                    if(ownerImage.rectTransform.eulerAngles.z == 0.0f && baseAngle == 360.0f)
+                    if (ownerImage.rectTransform.eulerAngles.z == 0.0f && baseAngle == 360.0f)
                     {
-                        ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                        ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond));
                     }
                     else
                     {
@@ -172,7 +206,7 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
                 }
                 else
                 {
-                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * sensorDist);
+                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond));
                 }
             }
 
@@ -200,9 +234,11 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
         // Rotation Direction : left
         else
         {
-            if(shape != null && shape.AutoMove == true)
+            Debug.Log("Left Rotation");
+
+            if (shape != null && shape.AutoMove == true)
             {
-                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime * sensorDist);
+                ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * Time.deltaTime);
             }
             else
             {
@@ -211,17 +247,12 @@ public class RectRottation : MonoBehaviour, MoveAndRotateInterface
                     Vector3 curRotation = ownerImage.rectTransform.eulerAngles;
                     curRotation.z = baseAngle + 90.0f;
                     ownerImage.rectTransform.eulerAngles = curRotation;
-                    Debug.Log("Rotate Clamp Left");
-                    Debug.Log("Real Cur Rotation : " + ownerImage.rectTransform.eulerAngles.z + ", Base Rotation : " + baseAngle);
                 }
                 else
                 {
-                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) /** Time.deltaTime*/ * sensorDist);
-                    Debug.Log("Rotate Left");
-                    Debug.Log("Real Cur Rotation : " + ownerImage.rectTransform.eulerAngles.z + ", Base Rotation : " + baseAngle);
+                    ownerImage.rectTransform.RotateAround(pivotPoint.rectTransform.position, Vector3.back, Mathf.Abs(rotationAnglePerSecond) * (-1));   // ?
                 }
             }
-
 
             // When the TouchPoint touch ground
             if (touchPoint.transform.position.y <= pivotPoint.transform.position.y)

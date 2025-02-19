@@ -6,6 +6,9 @@ using UnityEngine.UIElements;
 
 public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 {
+    #region PrevCode
+
+    /*
     [SerializeField] float MoveSpeed;      // 필요시 사용
     [SerializeField] float RotationSpeed;  // 필요시 사용
 
@@ -32,9 +35,74 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
     {
         // pivot, cycloid, touch point init (option for title scene)
     }
+    */
+
+    #endregion
+
+
+    [SerializeField] float MoveSpeed;      // 필요시 사용
+    [SerializeField] float RotationSpeed;  // 필요시 사용
+
+    int amount;
+    float radius;
+    float distancePerStep;
+    float rotationAngleDeg;
+
+    void Awake()
+    {
+        radius = 216.5f;
+        distancePerStep = 55.0f;
+
+    }
+
+    void Update()
+    {
+        /*
+        // Input Test Code
+        float input = Input.GetAxisRaw("Horizontal");
+        MoveAndRotate((int)input);
+        */
+        
+    }
+
+    IEnumerator CoroutineMoveRotate(int direction)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            transform.Translate(direction * distancePerStep, 0, 0, Space.World);
+            transform.Rotate(0, 0, rotationAngleDeg);
+            yield return null;
+        }
+    }
+    public void MoveAndRotate(int sensorDist)
+    {
+        int direction = (sensorDist > 0) ? -1 : 1;
+
+        amount = Mathf.Abs(sensorDist);
+        if (direction < 0)
+        {
+            rotationAngleDeg = (distancePerStep / radius) * Mathf.Rad2Deg * Vector3.forward.z;
+        }
+        else 
+        { 
+            rotationAngleDeg = (distancePerStep / radius) * Mathf.Rad2Deg * Vector3.back.z;
+        }
+
+        StartCoroutine(CoroutineMoveRotate(direction));
+    }
+
+
+    public void InitPivotPoint()
+    {
+        // pivot, cycloid, touch point init (option for title scene)
+    }
+
 }
 
-/*    IEnumerator Rotate(float TargetRotate)
+#region TestCode
+
+/*    
+    IEnumerator Rotate(float TargetRotate)
     {
         float startRotation = transform.eulerAngles.z;
         float targetRotation = TargetRotate;
@@ -75,4 +143,6 @@ public class SphereRotation : MonoBehaviour, MoveAndRotateInterface
 
         transform.position = targetLocation;
     }*/
+
+#endregion
 
